@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:api.anthropic.com)",
+      "Bash(cp \"/Users/hioyuuma/.claude/projects/-Users-hioyuuma-----EduTracker/5cb99d65-f69e-452d-b113-5ee6f424d829/tool-results/webfetch-1776662242718-ekb4jx.bin\" /tmp/design.gz)",
+      "Bash(gunzip -c /tmp/design.gz)",
+      "Bash(cp /tmp/design.gz /tmp/design_extracted)",
+      "Read(//tmp/**)",
+      "Bash(mkdir -p /tmp/design_extracted)",
+      "Bash(tar -xf /tmp/design_out -C /tmp/design_extracted)",
+      "Bash(wc -l /tmp/design_extracted/untitled/project/app/*.jsx /tmp/design_extracted/untitled/project/app/*.js)",
+      "Bash(npm -v)",
+      "Bash(npm create:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(npx vite:*)"
+    ]
+  }
+}
