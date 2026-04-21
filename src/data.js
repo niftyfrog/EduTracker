@@ -12,125 +12,164 @@ export function relativeDate(dateStr) {
   return `${d.getMonth() + 1}/${d.getDate()}`
 }
 
-// ─── Mock Data ────────────────────────────────────────────────────────────────
+// ─── Curriculum Steps ─────────────────────────────────────────────────────────
 
-export const LANGUAGES = [
-  { id: 'java',   name: 'Java',       icon: 'devicon-java-plain colored',       total: 10, color: '#f89820' },
-  { id: 'python', name: 'Python',     icon: 'devicon-python-plain colored',     total: 10, color: '#4d9fff' },
-  { id: 'sql',    name: 'SQL',        icon: 'devicon-mysql-plain colored',      total: 5,  color: '#a78bfa' },
-  { id: 'js',     name: 'JavaScript', icon: 'devicon-javascript-plain colored', total: 8,  color: '#f5c542' },
-  { id: 'git',    name: 'Git',        icon: 'devicon-git-plain colored',        total: 5,  color: '#00e599' },
+export const STEPS = [
+  {
+    id: 'step0',
+    no: 0,
+    label: 'Step 0',
+    title: 'Visual Studioのインストール・基本操作',
+    type: 'checklist',
+    color: '#6366f1',
+    icon: 'devicon-visualstudio-plain colored',
+    topics: [],
+    submission: null,
+    criteria: null,
+    tasks: [
+      { id: 1, no: 1, title: 'インストール手順', desc: 'Visual Studio Community（または Professional）をインストールする。必要なワークロード（「.NETデスクトップ開発」）を選択して完了させること。', links: [], comments: [] },
+      { id: 2, no: 2, title: 'プロジェクトの作り方', desc: '新規プロジェクトの作成手順を覚える。コンソールアプリとWindowsフォームアプリの両方を作れるようにする。', links: [], comments: [] },
+      { id: 3, no: 3, title: '実行・デバッグの基本', desc: 'F5でのデバッグ実行、Ctrl+F5での通常実行の違い、ブレークポイントの設定と変数ウォッチの使い方を覚える。', links: [], comments: [] },
+      { id: 4, no: 4, title: 'exeの書き出し方', desc: 'リリースビルドでexeを出力する方法を覚える。発行（Publish）機能の使い方も確認すること。', links: [], comments: [] },
+    ],
+  },
+  {
+    id: 'step1',
+    no: 1,
+    label: 'Step 1',
+    title: 'C# 基礎（コンソールアプリ）',
+    type: 'assignment',
+    color: '#9b59b6',
+    icon: 'devicon-csharp-plain colored',
+    topics: [
+      '変数・条件分岐・ループ・関数',
+      'エラーの読み方・ブレークポイントなど（Visual Studioの活用）',
+    ],
+    submission: 'exe + スクショ（または動画）',
+    criteria: '指定動作が正しく動くか',
+    tasks: [
+      { id: 1, no: 1, title: '変数とデータ型', tag: '基礎', desc: 'int・double・string・bool などの基本データ型と変数宣言を学ぶ。型変換（int.Parse, ToString など）も確認すること。Console.WriteLine で値を出力できるようにする。', links: [], comments: [] },
+      { id: 2, no: 2, title: '条件分岐（if / switch）', tag: '基礎', desc: 'if・else if・else による条件分岐と、switch 文の書き方を学ぶ。比較演算子（== != < > <= >=）と論理演算子（&& || !）も合わせて理解すること。', links: [], comments: [] },
+      { id: 3, no: 3, title: 'ループ（for / while / foreach）', tag: '基礎', desc: 'for・while・do-while の違いと使い分けを学ぶ。break・continue の動作も確認すること。配列や List に対して foreach を使えるようにする。', links: [], comments: [] },
+      { id: 4, no: 4, title: 'メソッド（関数）', tag: '基礎', desc: 'メソッドの定義・呼び出し・引数・戻り値の基本を学ぶ。void と返り値あり（int, string など）の両方を書けるようにすること。', links: [], comments: [] },
+      { id: 5, no: 5, title: 'コンソール版電卓', tag: '課題', desc: '四則演算（+/-/×/÷）が動作するコンソールアプリを作成する。0除算エラーのハンドリングも実装すること。繰り返し計算できるようにループを使うこと。', links: [], comments: [
+        { who: '田中 先輩', role: 'admin', date: '2026-04-18', text: 'まずは足し算だけ動かして、少しずつ機能を追加していきましょう！' },
+      ] },
+      { id: 6, no: 6, title: 'おみくじアプリ', tag: '課題', desc: 'ランダムで「大吉・中吉・小吉・吉・凶」を表示するコンソールアプリを作成する。何度でも引き直せること。終了コマンドも実装すること。', links: [], comments: [] },
+    ],
+  },
+  {
+    id: 'step2',
+    no: 2,
+    label: 'Step 2',
+    title: 'C# + コントロール（Windowsフォームアプリ）',
+    type: 'assignment',
+    color: '#e74c3c',
+    icon: 'devicon-csharp-plain colored',
+    topics: [
+      'コントロールの種類・プロパティ・イベント',
+      'Step 1のロジックをGUIに移植する',
+    ],
+    submission: 'exe + スクショ（または動画）',
+    criteria: '指定動作が正しく動くか・見た目は不問',
+    tasks: [
+      { id: 1, no: 1, title: 'GUI版電卓', tag: '課題', desc: 'Step 1で作ったコンソール電卓のロジックをWindowsフォームに移植する。ボタンとテキストボックスを使ってGUI操作できること。', links: [], comments: [
+        { who: '山田 花子', role: 'trainee', date: '2026-04-19', text: 'Buttonのイベントがうまく設定できませんでした。もう一度確認します。' },
+        { who: '田中 先輩', role: 'admin', date: '2026-04-20', text: 'デザイナーからButtonをダブルクリックするとイベントが自動で作られますよ！' },
+      ] },
+      { id: 2, no: 2, title: 'GUI版おみくじアプリ', tag: '課題', desc: 'Step 1で作ったおみくじアプリをWindowsフォームに移植する。ボタンをクリックで結果がLabelに表示されること。', links: [], comments: [] },
+    ],
+  },
+  {
+    id: 'step3',
+    no: 3,
+    label: 'Step 3',
+    title: 'SQL',
+    type: 'assignment',
+    color: '#a78bfa',
+    icon: 'devicon-mysql-plain colored',
+    topics: [
+      'SQL Server / PostgreSQL',
+      '基本的なCRUD操作',
+    ],
+    submission: 'スクショ + クエリ',
+    criteria: '正しくデータの取得・登録・更新・削除ができるか',
+    tasks: [
+      { id: 1, no: 1, title: 'データの取得（SELECT）', tag: '課題', desc: '指定テーブルからデータを取得するSELECT文を記述する。WHERE・ORDER BY・GROUP BYを使ったクエリも含む。', links: [], comments: [
+        { who: '田中 先輩', role: 'admin', date: '2026-04-19', text: 'INNER JOINとLEFT JOINの違いも押さえておくと後々役立ちます。' },
+      ] },
+      { id: 2, no: 2, title: 'データの登録（INSERT）', tag: '課題', desc: '指定テーブルにデータをINSERTする。複数件のまとめてINSERTも実施すること。', links: [], comments: [] },
+      { id: 3, no: 3, title: 'データの更新（UPDATE）', tag: '課題', desc: '条件を指定してデータをUPDATEする。誤って全件更新しないようWHERE句の確認も行うこと。', links: [], comments: [] },
+      { id: 4, no: 4, title: 'データの削除（DELETE）', tag: '課題', desc: '条件を指定してデータをDELETEする。論理削除と物理削除の違いも理解すること。', links: [], comments: [] },
+    ],
+  },
+  {
+    id: 'step4',
+    no: 4,
+    label: 'Step 4〜',
+    title: '実案件',
+    type: 'project',
+    color: '#f89820',
+    icon: 'devicon-java-plain colored',
+    topics: [
+      'Java / その他',
+      '仕様書を読んで自分で作る',
+      '仕様書を書く課題も含む',
+    ],
+    submission: '仕様書 + 成果物一式',
+    criteria: '仕様通りに動作するか',
+    tasks: [],
+  },
 ]
 
-export const TASKS_DATA = {
-  java: [
-    { id: 1,  no: 1,  title: '変数とデータ型',             tag: '基礎',   desc: 'Javaにおける基本的なデータ型（int, String, boolean等）と変数の宣言方法を学習します。', links: ['https://docs.oracle.com/javase/tutorial/', 'https://qiita.com/java-basics'],
-      comments: [{ who: '田中 先輩', role: 'admin', date: '2026-04-18', text: '公式ドキュメントをしっかり読んでみてください！' }] },
-    { id: 2,  no: 2,  title: '制御フロー（if/for/while）', tag: '基礎',   desc: '条件分岐と繰り返し処理の基本を理解し、実際にコードで確認します。', links: ['https://docs.oracle.com/javase/tutorial/java/nutsandbolts/flow.html'],
-      comments: [{ who: '鈴木 太郎', role: 'trainee', date: '2026-04-19', text: 'whileとdo-whileの違いがよくわかりませんでした。また確認します。' }] },
-    { id: 3,  no: 3,  title: 'オブジェクト指向の基本',     tag: '基礎',   desc: 'クラス・インスタンス・継承・ポリモーフィズムの概念を理解します。', links: ['https://docs.oracle.com/javase/tutorial/java/concepts/', 'https://qiita.com/oop-guide', 'https://confluence.internal/java-samples'],
-      comments: [
-        { who: '田中 先輩', role: 'admin',   date: '2026-04-18', text: 'まずリンク①を読んでから手を動かしてください！' },
-        { who: '山田 花子', role: 'trainee', date: '2026-04-19', text: '継承のところが難しかったですが、サンプルコードで理解できました！' },
-        { who: '田中 先輩', role: 'admin',   date: '2026-04-20', text: 'よく頑張りました！次はポリモーフィズムの実装例も確認してみましょう。' },
-      ] },
-    { id: 4,  no: 4,  title: '例外処理',                   tag: '基礎',   desc: 'try-catch-finallyを使った例外処理の書き方を学びます。', links: ['https://docs.oracle.com/javase/tutorial/essential/exceptions/'], comments: [] },
-    { id: 5,  no: 5,  title: 'コレクションフレームワーク', tag: '基礎',   desc: 'List, Map, Setなどのコレクションクラスの使い方を学習します。', links: [],
-      comments: [{ who: '田中 先輩', role: 'admin', date: '2026-04-20', text: 'ここは実案件でも頻繁に出てきます。特にHashMapの使い方を重点的に。' }] },
-    { id: 6,  no: 6,  title: 'ストリームAPI',               tag: '基礎',   desc: 'Java 8以降のStream APIを使ったデータ処理を学びます。', links: [], comments: [] },
-    { id: 7,  no: 7,  title: 'ファイルI/O処理（実案件ベース）', tag: '実案件', desc: '実際の案件で使われるファイル読み書きのパターンを学習します。', links: [], comments: [] },
-    { id: 8,  no: 8,  title: 'Spring Boot入門',            tag: '実案件', desc: 'Spring Bootを使ったWeb APIの基本構造を理解します。', links: [], comments: [] },
-    { id: 9,  no: 9,  title: 'JUnit テスト入門',           tag: '実案件', desc: 'ユニットテストの書き方とTDDの基礎を学びます。', links: [], comments: [] },
-    { id: 10, no: 10, title: 'DB連携（JDBC/JPA）',         tag: '実案件', desc: 'データベースとJavaアプリケーションの連携方法を学習します。', links: [], comments: [] },
-  ],
-  python: [
-    { id: 11, no: 1,  title: 'Python基礎文法',    tag: '基礎',   desc: 'Python特有の文法と基本的なデータ型を学習します。', links: [], comments: [] },
-    { id: 12, no: 2,  title: 'リスト・辞書・タプル', tag: '基礎', desc: 'Pythonのコレクション型を理解します。', links: [], comments: [] },
-    { id: 13, no: 3,  title: '関数と高階関数',     tag: '基礎',   desc: 'def, lambda, map/filterを学習します。', links: [], comments: [] },
-    { id: 14, no: 4,  title: 'クラスとOOP',        tag: '基礎',   desc: 'Pythonにおけるオブジェクト指向を理解します。', links: [],
-      comments: [{ who: '田中 先輩', role: 'admin', date: '2026-04-17', text: 'Javaとの比較でPythonのOOPの特徴を整理してみてください。' }] },
-    { id: 15, no: 5,  title: 'ファイル操作',       tag: '基礎',   desc: 'テキスト・CSVファイルの読み書きを学びます。', links: [], comments: [] },
-    { id: 16, no: 6,  title: 'pip・仮想環境',      tag: '基礎',   desc: 'パッケージ管理と仮想環境の使い方を学びます。', links: [], comments: [] },
-    { id: 17, no: 7,  title: 'pandas入門',         tag: '実案件', desc: 'データ分析の基礎ライブラリを学習します。', links: [], comments: [] },
-    { id: 18, no: 8,  title: 'FastAPI入門',        tag: '実案件', desc: 'REST APIの作成をFastAPIで学びます。', links: [], comments: [] },
-    { id: 19, no: 9,  title: 'テスト（pytest）',   tag: '実案件', desc: 'pytestを使ったテストの書き方を学びます。', links: [], comments: [] },
-    { id: 20, no: 10, title: 'Docker連携',         tag: '実案件', desc: 'Pythonアプリのコンテナ化を学習します。', links: [], comments: [] },
-  ],
-  sql: [
-    { id: 21, no: 1, title: 'SELECT基礎',                    tag: '基礎',   desc: '基本的なSELECT文の書き方を学習します。', links: [], comments: [] },
-    { id: 22, no: 2, title: 'WHERE・ORDER BY・GROUP BY',     tag: '基礎',   desc: '絞り込み・並び替え・集計を学びます。', links: [], comments: [] },
-    { id: 23, no: 3, title: 'JOIN（結合）',                  tag: '基礎',   desc: 'テーブルの結合方法を学習します。', links: [],
-      comments: [{ who: '田中 先輩', role: 'admin', date: '2026-04-19', text: 'INNER JOINとLEFT JOINの違いをしっかり押さえてください。' }] },
-    { id: 24, no: 4, title: 'サブクエリ',                    tag: '基礎',   desc: 'ネストしたクエリの書き方を理解します。', links: [], comments: [] },
-    { id: 25, no: 5, title: 'トランザクション・インデックス', tag: '実案件', desc: 'パフォーマンスチューニングの基礎を学びます。', links: [], comments: [] },
-  ],
-  js: [
-    { id: 26, no: 1, title: 'JavaScript基礎',           tag: '基礎',   desc: 'JS特有の文法と型を学習します。', links: [], comments: [] },
-    { id: 27, no: 2, title: '非同期処理（Promise/async）', tag: '基礎', desc: '非同期プログラミングのパターンを学びます。', links: [], comments: [] },
-    { id: 28, no: 3, title: 'DOM操作',                  tag: '基礎',   desc: 'ブラウザAPIを使ったDOM操作を学習します。', links: [], comments: [] },
-    { id: 29, no: 4, title: 'React入門',                tag: '実案件', desc: 'コンポーネントベースのUI開発を学びます。', links: [], comments: [] },
-    { id: 30, no: 5, title: 'REST API呼び出し（fetch）', tag: '実案件', desc: 'フロントエンドからのAPI連携を学習します。', links: [], comments: [] },
-    { id: 31, no: 6, title: 'TypeScript入門',           tag: '実案件', desc: '型安全なJavaScriptを学びます。', links: [], comments: [] },
-    { id: 32, no: 7, title: 'テスト（Jest）',           tag: '実案件', desc: 'Jestを使ったユニットテストを学習します。', links: [], comments: [] },
-    { id: 33, no: 8, title: 'ビルドツール（Vite）',     tag: '実案件', desc: 'モダンなフロントエンドビルドを学習します。', links: [], comments: [] },
-  ],
-  git: [
-    { id: 34, no: 1, title: 'Gitの基本（init/add/commit）', tag: '基礎', desc: 'バージョン管理の基礎を学習します。', links: [], comments: [] },
-    { id: 35, no: 2, title: 'ブランチとマージ',             tag: '基礎', desc: 'ブランチ戦略とマージを学びます。', links: [], comments: [] },
-    { id: 36, no: 3, title: 'リモートリポジトリ（GitHub）', tag: '基礎', desc: 'push/pull/cloneを学習します。', links: [], comments: [] },
-    { id: 37, no: 4, title: 'プルリクエスト文化',           tag: '基礎', desc: 'コードレビューの進め方を学びます。', links: [], comments: [] },
-    { id: 38, no: 5, title: 'コンフリクト解消',             tag: '基礎', desc: 'マージコンフリクトの解決方法を学びます。', links: [], comments: [] },
-  ],
-}
-
-// checked: { langId: { taskId(string): dateString } }
+// checked: { stepId: { taskId(string): dateString } }
 export const TRAINEES = [
   {
     id: 'trainee_001', name: '山田 花子', joined: '2026年4月',
     checked: {
-      java:   { '1': '2026-04-07', '2': '2026-04-07', '3': '2026-04-08', '4': '2026-04-09', '5': '2026-04-10', '6': '2026-04-14', '7': '2026-04-15', '8': '2026-04-16' },
-      python: { '11': '2026-04-01', '12': '2026-04-02', '13': '2026-04-03', '14': '2026-04-07', '15': '2026-04-08', '16': '2026-04-09', '17': '2026-04-14' },
-      sql:    { '21': '2026-04-10', '22': '2026-04-11', '23': '2026-04-14' },
-      js:     {},
-      git:    { '34': '2026-04-01', '35': '2026-04-02', '36': '2026-04-03', '37': '2026-04-07', '38': '2026-04-08' },
+      step0: { '1': '2026-04-07', '2': '2026-04-07', '3': '2026-04-08', '4': '2026-04-09' },
+      step1: { '1': '2026-04-10', '2': '2026-04-10', '3': '2026-04-13', '4': '2026-04-14', '5': '2026-04-14', '6': '2026-04-15' },
+      step2: { '1': '2026-04-16' },
+      step3: { '1': '2026-04-17', '2': '2026-04-18' },
+      step4: {},
     },
   },
   {
     id: 'trainee_002', name: '鈴木 太郎', joined: '2026年4月',
     checked: {
-      java:   { '1': '2026-04-07', '2': '2026-04-08', '3': '2026-04-09', '4': '2026-04-10', '5': '2026-04-14' },
-      python: { '11': '2026-04-14', '12': '2026-04-15', '13': '2026-04-16' },
-      sql:    { '21': '2026-04-17', '22': '2026-04-20' },
-      js:     {},
-      git:    { '34': '2026-04-07', '35': '2026-04-08', '36': '2026-04-09' },
+      step0: { '1': '2026-04-07', '2': '2026-04-08', '3': '2026-04-09', '4': '2026-04-10' },
+      step1: { '1': '2026-04-14', '2': '2026-04-14', '3': '2026-04-15' },
+      step2: {},
+      step3: {},
+      step4: {},
     },
   },
   {
     id: 'trainee_003', name: '伊藤 美咲', joined: '2026年4月',
     checked: {
-      java:   { '1': '2026-04-06', '2': '2026-04-07', '3': '2026-04-08', '4': '2026-04-09', '5': '2026-04-13', '6': '2026-04-14' },
-      python: { '11': '2026-04-13', '12': '2026-04-14', '13': '2026-04-15', '14': '2026-04-16', '15': '2026-04-17' },
-      sql:    { '21': '2026-04-16', '22': '2026-04-17', '23': '2026-04-20' },
-      js:     { '26': '2026-04-18' },
-      git:    { '34': '2026-04-06', '35': '2026-04-07', '36': '2026-04-08', '37': '2026-04-09', '38': '2026-04-13' },
+      step0: { '1': '2026-04-06', '2': '2026-04-07', '3': '2026-04-08', '4': '2026-04-09' },
+      step1: { '1': '2026-04-13', '2': '2026-04-13', '3': '2026-04-14', '4': '2026-04-14', '5': '2026-04-15', '6': '2026-04-16' },
+      step2: { '1': '2026-04-17', '2': '2026-04-18' },
+      step3: { '1': '2026-04-17' },
+      step4: {},
     },
   },
 ]
 
 // ─── Helper Functions ─────────────────────────────────────────────────────────
 
-export function getProgress(trainee, langId) {
-  const tasks = TASKS_DATA[langId] || []
-  if (!tasks.length) return 0
-  const done = Object.keys(trainee.checked[langId] || {}).length
-  return Math.round((done / tasks.length) * 100)
+export function getProgress(trainee, stepId) {
+  const step = STEPS.find(s => s.id === stepId)
+  if (!step || !step.tasks.length) return 0
+  const done = Object.keys(trainee.checked[stepId] || {}).length
+  return Math.round((done / step.tasks.length) * 100)
 }
 
 export function getOverallProgress(trainee) {
   let total = 0, done = 0
-  LANGUAGES.forEach(l => {
-    total += (TASKS_DATA[l.id] || []).length
-    done += Object.keys(trainee.checked[l.id] || {}).length
+  STEPS.forEach(s => {
+    total += s.tasks.length
+    done += Object.keys(trainee.checked[s.id] || {}).length
   })
   return total ? Math.round((done / total) * 100) : 0
 }
@@ -142,8 +181,8 @@ export function getTotalDone(trainee) {
 // Returns { 'YYYY-MM-DD': count } for all completion dates
 export function getCompletionDates(trainee) {
   const counts = {}
-  Object.values(trainee.checked).forEach(langChecked => {
-    Object.values(langChecked).forEach(date => {
+  Object.values(trainee.checked).forEach(stepChecked => {
+    Object.values(stepChecked).forEach(date => {
       if (date) counts[date] = (counts[date] || 0) + 1
     })
   })
@@ -153,12 +192,12 @@ export function getCompletionDates(trainee) {
 // Tasks with admin comments → trainee notifications
 export function getTraineeNotifications() {
   const items = []
-  LANGUAGES.forEach(l => {
-    TASKS_DATA[l.id].forEach(task => {
-      const adminComments = task.comments.filter(c => c.role === 'admin')
+  STEPS.forEach(s => {
+    s.tasks.forEach(task => {
+      const adminComments = (task.comments || []).filter(c => c.role === 'admin')
       if (adminComments.length > 0) {
         const latest = adminComments[adminComments.length - 1]
-        items.push({ task, lang: l, comment: latest })
+        items.push({ task, step: s, comment: latest })
       }
     })
   })
@@ -172,11 +211,11 @@ export function getRecentCompletions(trainees, days = 7) {
   const cutoffStr = cutoff.toISOString().split('T')[0]
   const result = []
   trainees.forEach(trainee => {
-    LANGUAGES.forEach(l => {
-      Object.entries(trainee.checked[l.id] || {}).forEach(([taskId, date]) => {
+    STEPS.forEach(s => {
+      Object.entries(trainee.checked[s.id] || {}).forEach(([taskId, date]) => {
         if (date >= cutoffStr) {
-          const task = TASKS_DATA[l.id]?.find(t => String(t.id) === taskId)
-          if (task) result.push({ trainee, task, lang: l, date })
+          const task = s.tasks.find(t => String(t.id) === taskId)
+          if (task) result.push({ trainee, task, step: s, date })
         }
       })
     })

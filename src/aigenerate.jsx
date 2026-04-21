@@ -1,6 +1,6 @@
 import React from 'react'
 
-const AI_LANGUAGES = ['C#', 'SQL', 'VB.NET', 'Java', 'Oracle DB', 'Python', 'JavaScript']
+const AI_LANGUAGES = ['C#', 'SQL', 'Java']
 const AI_TAGS = ['基礎', '実案件']
 
 export function AIGenerateScreen({ role }) {

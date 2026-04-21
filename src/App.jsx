@@ -1,7 +1,7 @@
 import React from 'react'
-import { LANGUAGES, TRAINEES } from './data'
+import { STEPS, TRAINEES } from './data'
 import { Avatar } from './components'
-import { Sidebar, AdminDashboard, TraineeDashboard, LanguageScreen, TaskListScreen, TaskDetailScreen, TaskEditScreen, TraineeManagementScreen, TraineeDetailView } from './screens'
+import { Sidebar, AdminDashboard, TraineeDashboard, StepListScreen, TaskListScreen, TaskDetailScreen, TaskEditScreen, TraineeManagementScreen, TraineeDetailView } from './screens'
 import { FAMapScreen } from './famap'
 import { AIGenerateScreen } from './aigenerate'
 
@@ -10,7 +10,7 @@ export default function App() {
 
   const [role, setRole] = React.useState(saved.role || 'admin')
   const [screen, setScreenRaw] = React.useState(saved.screen || 'dashboard')
-  const [selectedLang, setSelectedLang] = React.useState(LANGUAGES[0])
+  const [selectedStep, setSelectedStep] = React.useState(STEPS[0])
   const [selectedTask, setSelectedTask] = React.useState(null)
   const [editTask, setEditTask] = React.useState(null)
   const [selectedTrainee, setSelectedTrainee] = React.useState(TRAINEES[0])
@@ -41,21 +41,21 @@ export default function App() {
     switch (screen) {
       case 'dashboard':
         return role === 'admin'
-          ? <AdminDashboard trainees={traineeData} setScreen={setScreen} setSelectedTrainee={setSelectedTrainee} setSelectedLang={setSelectedLang} />
-          : <TraineeDashboard trainee={myTrainee} setScreen={setScreen} setSelectedLang={setSelectedLang} setSelectedTask={setSelectedTask} />
+          ? <AdminDashboard trainees={traineeData} setScreen={setScreen} setSelectedTrainee={setSelectedTrainee} setSelectedStep={setSelectedStep} />
+          : <TraineeDashboard trainee={myTrainee} setScreen={setScreen} setSelectedStep={setSelectedStep} setSelectedTask={setSelectedTask} />
       case 'dashboard-trainee-view':
-        return <TraineeDetailView trainee={liveSelectedTrainee} setScreen={setScreen} setSelectedLang={setSelectedLang} />
-      case 'languages':
-        return <LanguageScreen trainee={traineeForTasks} role={role} setScreen={setScreen} setSelectedLang={setSelectedLang} setEditTask={setEditTask} />
+        return <TraineeDetailView trainee={liveSelectedTrainee} setScreen={setScreen} setSelectedStep={setSelectedStep} />
+      case 'curriculum':
+        return <StepListScreen trainee={traineeForTasks} role={role} setScreen={setScreen} setSelectedStep={setSelectedStep} setEditTask={setEditTask} />
       case 'famap':
         return <FAMapScreen role={role} />
       case 'aigenerate':
         return <AIGenerateScreen role={role} />
       case 'tasks':
-        return <TaskListScreen trainee={traineeForTasks} setTrainee={setTraineeForTasks} selectedLang={selectedLang} role={role} setScreen={setScreen} setSelectedTask={setSelectedTask} setEditTask={setEditTask} setSelectedLang={setSelectedLang} />
+        return <TaskListScreen trainee={traineeForTasks} setTrainee={setTraineeForTasks} selectedStep={selectedStep} role={role} setScreen={setScreen} setSelectedTask={setSelectedTask} setEditTask={setEditTask} />
       case 'detail':
         return selectedTask
-          ? <TaskDetailScreen task={selectedTask} trainee={traineeForTasks} setTrainee={setTraineeForTasks} selectedLang={selectedLang} role={role} setScreen={setScreen} setEditTask={setEditTask} />
+          ? <TaskDetailScreen task={selectedTask} trainee={traineeForTasks} setTrainee={setTraineeForTasks} selectedStep={selectedStep} role={role} setScreen={setScreen} setEditTask={setEditTask} />
           : <div style={{ padding: 40, color: '#888' }}>課題が選択されていません</div>
       case 'edit':
         return editTask && role === 'admin'

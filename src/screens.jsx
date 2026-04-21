@@ -1,5 +1,5 @@
 import React from 'react'
-import { LANGUAGES, TASKS_DATA, getProgress, getOverallProgress, getCompletionDates, getRecentCompletions, getTraineeNotifications, relativeDate, getTotalDone, TODAY } from './data'
+import { STEPS, getProgress, getOverallProgress, getCompletionDates, getRecentCompletions, getTraineeNotifications, relativeDate, getTotalDone, TODAY } from './data'
 import { N, ProgressBar, Badge, Card, Btn, Input, Select, Textarea, Avatar, SectionTitle, Divider, StatCard } from './components'
 
 // ── Sidebar ──────────────────────────────────────────────────────────────────
@@ -7,14 +7,14 @@ export function Sidebar({ screen, setScreen, role, user }) {
   const adminNav = [
     { id: 'dashboard',  label: 'ダッシュボード' },
     { id: 'famap',      label: 'FAシステムマップ', highlight: true },
-    { id: 'languages',  label: '言語・課題' },
+    { id: 'curriculum', label: 'カリキュラム' },
     { id: 'aigenerate', label: 'AI課題生成' },
     { id: 'trainees',   label: '新人管理' },
   ]
   const traineeNav = [
     { id: 'dashboard',  label: 'ダッシュボード' },
     { id: 'famap',      label: 'FAシステムマップ', highlight: true },
-    { id: 'languages',  label: '言語・課題' },
+    { id: 'curriculum', label: 'カリキュラム' },
     { id: 'aigenerate', label: 'AI課題生成' },
   ]
   const nav = role === 'admin' ? adminNav : traineeNav
@@ -75,8 +75,9 @@ export function Sidebar({ screen, setScreen, role, user }) {
 }
 
 // ── Admin Dashboard ───────────────────────────────────────────────────────────
-export function AdminDashboard({ trainees, setScreen, setSelectedTrainee, setSelectedLang }) {
+export function AdminDashboard({ trainees, setScreen, setSelectedTrainee, setSelectedStep }) {
   const recentCompletions = getRecentCompletions(trainees, 7)
+  const totalTasks = STEPS.reduce((a, s) => a + s.tasks.length, 0)
 
   return (
     <div className="reveal" style={{ padding: '32px 40px', maxWidth: 960, margin: '0 auto' }}>
@@ -87,7 +88,7 @@ export function AdminDashboard({ trainees, setScreen, setSelectedTrainee, setSel
 
       <div style={{ display: 'flex', gap: 12, marginBottom: 28 }}>
         <StatCard label="担当新人" value={trainees.length} suffix="名" />
-        <StatCard label="課題総数" value={Object.values(TASKS_DATA).reduce((a, b) => a + b.length, 0)} suffix="件" />
+        <StatCard label="課題総数" value={totalTasks} suffix="件" />
         <StatCard label="平均完了率"
           value={Math.round(trainees.reduce((a, t) => a + getOverallProgress(t), 0) / trainees.length)}
           suffix="%" color="#911619" />
@@ -103,7 +104,7 @@ export function AdminDashboard({ trainees, setScreen, setSelectedTrainee, setSel
         {recentCompletions.length === 0 && (
           <div style={{ padding: '16px 20px', fontSize: 13, color: '#bbb' }}>今週の達成はまだありません</div>
         )}
-        {recentCompletions.slice(0, 8).map(({ trainee, task, lang, date }, i) => (
+        {recentCompletions.slice(0, 8).map(({ trainee, task, step, date }, i) => (
           <div key={i} style={{
             display: 'flex', alignItems: 'center', gap: 12, padding: '11px 18px',
             borderBottom: i < Math.min(recentCompletions.length, 8) - 1 ? '1px solid rgba(0,0,0,0.06)' : 'none',
@@ -112,11 +113,11 @@ export function AdminDashboard({ trainees, setScreen, setSelectedTrainee, setSel
             <div style={{ flex: 1, fontSize: 13 }}>
               <span style={{ fontWeight: 500 }}>{trainee.name}</span>
               <span style={{ color: '#888' }}> が </span>
-              <i className={lang.icon} style={{ fontSize: 13 }} />
+              <span style={{ fontSize: 11, fontWeight: 700, padding: '1px 6px', borderRadius: 4, background: 'rgba(0,0,0,0.05)', color: step.color }}>{step.label}</span>
               <span style={{ color: '#555' }}> {task.title}</span>
               <span style={{ color: '#888' }}> を完了</span>
             </div>
-            <Badge color={task.tag === '基礎' ? 'default' : 'yellow'}>{task.tag}</Badge>
+            {task.tag && <Badge color={task.tag === '課題' ? 'default' : 'yellow'}>{task.tag}</Badge>}
             <span style={{ fontSize: 12, color: '#bbb', flexShrink: 0 }}>{relativeDate(date)}</span>
           </div>
         ))}
@@ -143,15 +144,14 @@ export function AdminDashboard({ trainees, setScreen, setSelectedTrainee, setSel
                 </div>
                 <ProgressBar value={overall} />
                 <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
-                  {LANGUAGES.map(l => {
-                    const p = getProgress(t, l.id)
+                  {STEPS.filter(s => s.tasks.length > 0).map(s => {
+                    const p = getProgress(t, s.id)
                     return (
-                      <div key={l.id} onClick={() => { setSelectedTrainee(t); setSelectedLang(l); setScreen('tasks') }}
+                      <div key={s.id} onClick={() => { setSelectedTrainee(t); setSelectedStep(s); setScreen('tasks') }}
                         style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5,
                           padding: '3px 8px', borderRadius: 4, background: '#f0f0f0', border: '1px solid rgba(0,0,0,0.07)',
                           fontSize: 12, color: '#666' }}>
-                        <i className={l.icon} style={{ fontSize: 15 }} />
-                        <span style={{ color: '#1a1a1a', fontWeight: 500 }}>{l.name}</span>
+                        <span style={{ fontWeight: 700, color: s.color, fontSize: 11 }}>{s.label}</span>
                         <span style={{ color: p === 100 ? '#911619' : '#888' }}>{p}%</span>
                       </div>
                     )
@@ -233,9 +233,10 @@ function HeatMap({ trainee }) {
 }
 
 // ── Trainee Dashboard ─────────────────────────────────────────────────────────
-export function TraineeDashboard({ trainee, setScreen, setSelectedLang, setSelectedTask }) {
+export function TraineeDashboard({ trainee, setScreen, setSelectedStep, setSelectedTask }) {
   const overall = getOverallProgress(trainee)
   const notifications = getTraineeNotifications()
+  const totalTasks = STEPS.reduce((a, s) => a + s.tasks.length, 0)
 
   return (
     <div className="reveal" style={{ padding: '32px 40px', maxWidth: 800, margin: '0 auto' }}>
@@ -253,32 +254,40 @@ export function TraineeDashboard({ trainee, setScreen, setSelectedLang, setSelec
             </div>
           </div>
           <div style={{ textAlign: 'right', color: '#888', fontSize: 13 }}>
-            {getTotalDone(trainee)} / {Object.values(TASKS_DATA).reduce((a,b)=>a+b.length,0)} 課題完了
+            {getTotalDone(trainee)} / {totalTasks} 課題完了
           </div>
         </div>
         <ProgressBar value={overall} height={6} />
       </Card>
 
-      <SectionTitle>言語ごとの完了率</SectionTitle>
+      <SectionTitle>ステップごとの完了率</SectionTitle>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {LANGUAGES.map(l => {
-          const p = getProgress(trainee, l.id)
-          const tasks = TASKS_DATA[l.id] || []
-          const done = Object.keys(trainee.checked[l.id] || {}).length
+        {STEPS.map(s => {
+          const p = s.tasks.length ? getProgress(trainee, s.id) : null
+          const done = Object.keys(trainee.checked[s.id] || {}).length
           return (
-            <Card key={l.id} onClick={() => { setSelectedLang(l); setScreen('tasks') }} style={{ padding: '14px 18px' }}>
+            <Card key={s.id} onClick={() => { setSelectedStep(s); setScreen('tasks') }} style={{ padding: '14px 18px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                <div style={{ fontSize: 20, width: 32, textAlign: 'center' }}><i className={l.icon} /></div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                    <span style={{ fontWeight: 500 }}>{l.name}</span>
-                    <span style={{ fontSize: 13, color: p === 100 ? '#911619' : '#666' }}>
-                      {done} / {tasks.length} {p === 100 && '✓'}
-                    </span>
-                  </div>
-                  <ProgressBar value={p} color={p === 100 ? '#911619' : l.color} height={4} />
+                <div style={{ flexShrink: 0 }}>
+                  <div style={{ fontSize: 11, fontWeight: 800, color: s.color, letterSpacing: '-0.01em' }}>{s.label}</div>
                 </div>
-                <div style={{ fontSize: 16, fontWeight: 700, color: p === 100 ? '#911619' : '#1a1a1a', width: 44, textAlign: 'right' }}>{p}%</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: s.tasks.length ? 6 : 0 }}>
+                    <span style={{ fontWeight: 500, fontSize: 13 }}>{s.title}</span>
+                    {s.tasks.length > 0 && (
+                      <span style={{ fontSize: 13, color: p === 100 ? '#911619' : '#666' }}>
+                        {done} / {s.tasks.length} {p === 100 && '✓'}
+                      </span>
+                    )}
+                    {s.tasks.length === 0 && (
+                      <span style={{ fontSize: 12, color: '#bbb' }}>案件による</span>
+                    )}
+                  </div>
+                  {s.tasks.length > 0 && <ProgressBar value={p} color={p === 100 ? '#911619' : s.color} height={4} />}
+                </div>
+                {p !== null && (
+                  <div style={{ fontSize: 16, fontWeight: 700, color: p === 100 ? '#911619' : '#1a1a1a', width: 44, textAlign: 'right' }}>{p}%</div>
+                )}
                 <span style={{ color: '#999', fontSize: 13 }}>→</span>
               </div>
             </Card>
@@ -301,9 +310,9 @@ export function TraineeDashboard({ trainee, setScreen, setSelectedLang, setSelec
           </div>
           {notifications.length === 0 && <div style={{ fontSize: 13, color: '#bbb' }}>新しい通知はありません</div>}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {notifications.map(({ task, lang, comment }) => (
+            {notifications.map(({ task, step, comment }) => (
               <div key={task.id}
-                onClick={() => { setSelectedTask(task); setSelectedLang(lang); setScreen('detail') }}
+                onClick={() => { setSelectedTask(task); setSelectedStep(step); setScreen('detail') }}
                 style={{ cursor: 'pointer', padding: '10px 12px', borderRadius: 8, background: '#fdf5f5', border: '1px solid rgba(145,22,25,0.1)', transition: 'background 0.12s' }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
@@ -313,7 +322,8 @@ export function TraineeDashboard({ trainee, setScreen, setSelectedLang, setSelec
                   <span style={{ fontSize: 11, color: '#bbb', marginLeft: 'auto' }}>{relativeDate(comment.date)}</span>
                 </div>
                 <div style={{ fontSize: 12, color: '#888', marginBottom: 3 }}>
-                  <i className={lang.icon} style={{ fontSize: 12, marginRight: 4 }} />{task.title}
+                  <span style={{ fontSize: 11, fontWeight: 700, color: step.color }}>{step.label}</span>
+                  <span style={{ marginLeft: 4 }}>{task.title}</span>
                 </div>
                 <div style={{ fontSize: 13, color: '#555', lineHeight: 1.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{comment.text}</div>
               </div>
@@ -325,39 +335,103 @@ export function TraineeDashboard({ trainee, setScreen, setSelectedLang, setSelec
   )
 }
 
-// ── Language Screen ───────────────────────────────────────────────────────────
-export function LanguageScreen({ trainee, role, setScreen, setSelectedLang, setEditTask }) {
+// ── Step List (Curriculum) Screen ─────────────────────────────────────────────
+export function StepListScreen({ trainee, role, setScreen, setSelectedStep, setEditTask }) {
   return (
-    <div className="reveal" style={{ padding: '32px 40px', maxWidth: 960, margin: '0 auto' }}>
+    <div className="reveal" style={{ padding: '32px 40px', maxWidth: 860, margin: '0 auto' }}>
       <div style={{ marginBottom: 28 }}>
-        <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>言語・課題</div>
+        <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>カリキュラム</div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.03em' }}>学習言語を選択</h1>
+          <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.03em' }}>学習ステップ</h1>
           {role === 'admin' && (
-            <Btn variant="primary" size="sm" onClick={() => { setEditTask({ id: null, langId: 'java', no: '', title: '', tag: '基礎', desc: '', links: [''] }); setScreen('edit') }}>
+            <Btn variant="primary" size="sm" onClick={() => { setEditTask({ id: null, stepId: 'step1', no: '', title: '', tag: '課題', desc: '', links: [''] }); setScreen('edit') }}>
               ＋ 課題を追加
             </Btn>
           )}
         </div>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-        {LANGUAGES.map(l => {
-          const p = getProgress(trainee, l.id)
-          const tasks = TASKS_DATA[l.id] || []
-          const done = Object.keys(trainee.checked[l.id] || {}).length
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+        {STEPS.map((s, idx) => {
+          const p = s.tasks.length ? getProgress(trainee, s.id) : null
+          const done = Object.keys(trainee.checked[s.id] || {}).length
+          const isLast = idx === STEPS.length - 1
+
           return (
-            <Card key={l.id} onClick={() => { setSelectedLang(l); setScreen('tasks') }} style={{ padding: '20px 22px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-                <div style={{ fontSize: 24 }}><i className={l.icon} /></div>
-                <div style={{ fontWeight: 600, fontSize: 16 }}>{l.name}</div>
-                {p === 100 && <Badge color="green">完了</Badge>}
+            <div key={s.id}>
+              <div
+                onClick={() => { setSelectedStep(s); setScreen('tasks') }}
+                style={{
+                  display: 'flex', gap: 18, cursor: 'pointer',
+                  padding: '18px 22px', borderRadius: 12,
+                  background: '#ffffff', border: '1px solid rgba(0,0,0,0.08)',
+                  transition: 'box-shadow 0.15s, border-color 0.15s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.09)'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.14)' }}
+                onMouseLeave={e => { e.currentTarget.style.boxShadow = ''; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.08)' }}
+              >
+                {/* Step badge */}
+                <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+                  <div style={{
+                    width: 48, height: 48, borderRadius: 12,
+                    background: `${s.color}18`, border: `2px solid ${s.color}40`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 20, color: s.color,
+                  }}>
+                    {s.type === 'checklist' ? '☑' : s.type === 'project' ? '🏢' : <i className={s.icon} />}
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: s.color, letterSpacing: '0.02em' }}>{s.label}</span>
+                    {s.type === 'checklist' && <Badge color="blue">チェックリスト</Badge>}
+                    {s.type === 'project' && <Badge color="yellow">実案件</Badge>}
+                    {p === 100 && <Badge color="green">完了</Badge>}
+                  </div>
+                  <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.01em', marginBottom: 8 }}>{s.title}</div>
+
+                  {/* Topics */}
+                  {s.topics.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 8 }}>
+                      {s.topics.map((t, i) => (
+                        <span key={i} style={{ fontSize: 12, color: '#666', padding: '2px 8px', borderRadius: 4, background: '#f0f0f0', border: '1px solid rgba(0,0,0,0.06)' }}>
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Submission & Criteria */}
+                  {s.submission && (
+                    <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#888', marginBottom: 8 }}>
+                      <span><span style={{ color: '#bbb' }}>提出：</span>{s.submission}</span>
+                      <span><span style={{ color: '#bbb' }}>合否：</span>{s.criteria}</span>
+                    </div>
+                  )}
+
+                  {/* Progress */}
+                  {s.tasks.length > 0 && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div style={{ flex: 1, maxWidth: 200 }}><ProgressBar value={p} color={p === 100 ? '#911619' : s.color} height={4} /></div>
+                      <span style={{ fontSize: 12, color: '#888' }}>{done} / {s.tasks.length} 課題</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: p === 100 ? '#911619' : '#444' }}>{p}%</span>
+                    </div>
+                  )}
+                  {s.tasks.length === 0 && (
+                    <div style={{ fontSize: 12, color: '#bbb' }}>案件ごとに設定</div>
+                  )}
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', color: '#999', fontSize: 16 }}>→</div>
               </div>
-              <ProgressBar value={p} color={p === 100 ? '#911619' : l.color} height={4} />
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, fontSize: 12, color: '#888' }}>
-                <span>{done} / {tasks.length} 課題完了</span>
-                <span style={{ fontWeight: 600, color: p === 100 ? '#911619' : '#666' }}>{p}%</span>
-              </div>
-            </Card>
+
+              {/* Arrow between steps */}
+              {!isLast && (
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '6px 0', color: '#ccc', fontSize: 18 }}>↓</div>
+              )}
+            </div>
           )
         })}
       </div>
@@ -366,26 +440,25 @@ export function LanguageScreen({ trainee, role, setScreen, setSelectedLang, setE
 }
 
 // ── Task List ─────────────────────────────────────────────────────────────────
-export function TaskListScreen({ trainee, setTrainee, selectedLang, role, setScreen, setSelectedTask, setEditTask }) {
+export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScreen, setSelectedTask, setEditTask }) {
   const [filter, setFilter] = React.useState('all')
-  const tasks = TASKS_DATA[selectedLang?.id] || []
-  const checkedMap = trainee.checked[selectedLang?.id] || {}
+  const tasks = selectedStep?.tasks || []
+  const checkedMap = trainee.checked[selectedStep?.id] || {}
+  const isChecklist = selectedStep?.type === 'checklist'
 
   const filtered = tasks.filter(t => {
     if (filter === 'done') return String(t.id) in checkedMap
     if (filter === 'undone') return !(String(t.id) in checkedMap)
-    if (filter === '基礎') return t.tag === '基礎'
-    if (filter === '実案件') return t.tag === '実案件'
     return true
   })
 
   function toggleCheck(taskId) {
-    const cur = trainee.checked[selectedLang.id] || {}
+    const cur = trainee.checked[selectedStep.id] || {}
     const key = String(taskId)
     const next = key in cur
       ? Object.fromEntries(Object.entries(cur).filter(([k]) => k !== key))
       : { ...cur, [key]: TODAY }
-    setTrainee({ ...trainee, checked: { ...trainee.checked, [selectedLang.id]: next } })
+    setTrainee({ ...trainee, checked: { ...trainee.checked, [selectedStep.id]: next } })
   }
 
   const done = Object.keys(checkedMap).length
@@ -394,43 +467,89 @@ export function TaskListScreen({ trainee, setTrainee, selectedLang, role, setScr
 
   return (
     <div className="reveal" style={{ padding: '32px 40px', maxWidth: 860, margin: '0 auto' }}>
+      {/* Breadcrumb */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, fontSize: 13, color: '#888' }}>
-        <span onClick={() => setScreen('languages')} style={{ cursor: 'pointer', color: '#666' }}>言語選択</span>
+        <span onClick={() => setScreen('curriculum')} style={{ cursor: 'pointer', color: '#666' }}>カリキュラム</span>
         <span>›</span>
-        <span style={{ color: '#1a1a1a', display: 'flex', alignItems: 'center', gap: 4 }}>{selectedLang && <i className={selectedLang.icon} />}{selectedLang?.name}</span>
+        <span style={{ color: '#1a1a1a', fontWeight: 500 }}>{selectedStep?.label}</span>
       </div>
 
+      {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20 }}>
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.03em', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
-            {selectedLang && <i className={selectedLang.icon} />}{selectedLang?.name} 課題一覧
-          </h1>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 200 }}><ProgressBar value={pct} color={selectedLang?.color || '#911619'} height={4} /></div>
-            <span style={{ fontSize: 13, color: '#666' }}>{done} / {total} 完了</span>
-            <span style={{ fontSize: 15, fontWeight: 700, color: '#911619' }}>{pct}%</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+            <span style={{ fontSize: 12, fontWeight: 800, color: selectedStep?.color }}>{selectedStep?.label}</span>
+            {isChecklist && <Badge color="blue">チェックリスト</Badge>}
           </div>
+          <h1 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 10 }}>
+            {selectedStep?.title}
+          </h1>
+          {total > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ width: 200 }}><ProgressBar value={pct} color={selectedStep?.color || '#911619'} height={4} /></div>
+              <span style={{ fontSize: 13, color: '#666' }}>{done} / {total} 完了</span>
+              <span style={{ fontSize: 15, fontWeight: 700, color: '#911619' }}>{pct}%</span>
+            </div>
+          )}
         </div>
         {role === 'admin' && (
-          <Btn variant="primary" size="sm" onClick={() => { setEditTask({ id: null, langId: selectedLang.id, no: tasks.length + 1, title: '', tag: '基礎', desc: '', links: [''] }); setScreen('edit') }}>
+          <Btn variant="primary" size="sm" onClick={() => { setEditTask({ id: null, stepId: selectedStep.id, no: tasks.length + 1, title: '', tag: '課題', desc: '', links: [''] }); setScreen('edit') }}>
             ＋ 課題追加
           </Btn>
         )}
       </div>
 
-      <div style={{ display: 'flex', gap: 6, marginBottom: 20 }}>
-        {['all','done','undone','基礎','実案件'].map(f => (
-          <button key={f} onClick={() => setFilter(f)} style={{
-            padding: '5px 12px', borderRadius: 6,
-            border: `1px solid ${filter===f ? 'rgba(145,22,25,0.35)' : 'rgba(0,0,0,0.09)'}`,
-            background: filter===f ? 'rgba(145,22,25,0.09)' : 'transparent',
-            color: filter===f ? '#911619' : '#666', fontSize: 13, cursor: 'pointer',
-            fontFamily: 'inherit', transition: 'all 0.12s',
-          }}>
-            {{ all:'すべて', done:'完了', undone:'未着手', '基礎':'基礎', '実案件':'実案件' }[f]}
-          </button>
-        ))}
-      </div>
+      {/* Step info panel for assignment/project steps */}
+      {!isChecklist && (selectedStep?.topics?.length > 0 || selectedStep?.submission) && (
+        <div style={{ marginBottom: 20, padding: '14px 18px', borderRadius: 10, background: `${selectedStep.color}0a`, border: `1px solid ${selectedStep.color}25` }}>
+          {selectedStep.topics.length > 0 && (
+            <div style={{ marginBottom: selectedStep.submission ? 10 : 0 }}>
+              <div style={{ fontSize: 11, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>学習内容</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {selectedStep.topics.map((t, i) => (
+                  <span key={i} style={{ fontSize: 13, color: '#555', padding: '3px 10px', borderRadius: 5, background: '#ffffff', border: '1px solid rgba(0,0,0,0.08)' }}>{t}</span>
+                ))}
+              </div>
+            </div>
+          )}
+          {selectedStep.submission && (
+            <div style={{ display: 'flex', gap: 24, marginTop: selectedStep.topics.length ? 10 : 0, fontSize: 13 }}>
+              <div>
+                <span style={{ color: '#999', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em' }}>提出方法　</span>
+                <span style={{ color: '#444', fontWeight: 500 }}>{selectedStep.submission}</span>
+              </div>
+              <div>
+                <span style={{ color: '#999', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em' }}>合否基準　</span>
+                <span style={{ color: '#444', fontWeight: 500 }}>{selectedStep.criteria}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Filter */}
+      {total > 0 && (
+        <div style={{ display: 'flex', gap: 6, marginBottom: 20 }}>
+          {['all','done','undone'].map(f => (
+            <button key={f} onClick={() => setFilter(f)} style={{
+              padding: '5px 12px', borderRadius: 6,
+              border: `1px solid ${filter===f ? 'rgba(145,22,25,0.35)' : 'rgba(0,0,0,0.09)'}`,
+              background: filter===f ? 'rgba(145,22,25,0.09)' : 'transparent',
+              color: filter===f ? '#911619' : '#666', fontSize: 13, cursor: 'pointer',
+              fontFamily: 'inherit', transition: 'all 0.12s',
+            }}>
+              {{ all:'すべて', done:'完了', undone:'未着手' }[f]}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {tasks.length === 0 && (
+        <div style={{ padding: '48px 24px', textAlign: 'center', color: '#bbb', border: '2px dashed rgba(0,0,0,0.1)', borderRadius: 12 }}>
+          <div style={{ fontSize: 32, marginBottom: 12 }}>🏢</div>
+          <div style={{ fontSize: 14 }}>実案件ごとに課題が設定されます</div>
+        </div>
+      )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         {filtered.map(task => {
@@ -453,21 +572,25 @@ export function TaskListScreen({ trainee, setTrainee, selectedLang, role, setScr
                 fontSize: 12, color: '#fff', fontWeight: 700,
               }}>{isDone && '✓'}</div>
               <span style={{ fontSize: 12, color: '#999', width: 20, textAlign: 'right', flexShrink: 0 }}>{task.no}</span>
-              <div onClick={() => { setSelectedTask(task); setScreen('detail') }} style={{ flex: 1, cursor: 'pointer' }}>
+              <div
+                onClick={isChecklist ? () => toggleCheck(task.id) : () => { setSelectedTask(task); setScreen('detail') }}
+                style={{ flex: 1, cursor: 'pointer' }}
+              >
                 <div style={{ color: isDone ? '#888' : '#1a1a1a', textDecoration: isDone ? 'line-through' : 'none', fontSize: 14, fontWeight: 500 }}>{task.title}</div>
                 {doneDate && <div style={{ fontSize: 12, color: '#bbb', marginTop: 1 }}>達成日 {doneDate}</div>}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Badge color={task.tag === '基礎' ? 'default' : 'yellow'}>{task.tag}</Badge>
-                {task.links.length > 0 && <span style={{ fontSize: 11, color: '#999' }}>🔗 {task.links.length}</span>}
-                {task.comments.length > 0 && <span style={{ fontSize: 11, color: '#999' }}>💬 {task.comments.length}</span>}
+                {!isChecklist && task.links?.length > 0 && <span style={{ fontSize: 11, color: '#999' }}>🔗 {task.links.length}</span>}
+                {!isChecklist && task.comments?.length > 0 && <span style={{ fontSize: 11, color: '#999' }}>💬 {task.comments.length}</span>}
               </div>
-              <div style={{ display: 'flex', gap: 4 }}>
-                <Btn size="sm" variant="ghost" onClick={() => { setSelectedTask(task); setScreen('detail') }}>詳細</Btn>
-                {role === 'admin' && (
-                  <Btn size="sm" variant="ghost" onClick={() => { setEditTask({ ...task, langId: selectedLang.id, links: task.links.length ? task.links : [''] }); setScreen('edit') }}>編集</Btn>
-                )}
-              </div>
+              {!isChecklist && (
+                <div style={{ display: 'flex', gap: 4 }}>
+                  <Btn size="sm" variant="ghost" onClick={() => { setSelectedTask(task); setScreen('detail') }}>詳細</Btn>
+                  {role === 'admin' && (
+                    <Btn size="sm" variant="ghost" onClick={() => { setEditTask({ ...task, stepId: selectedStep.id, links: task.links?.length ? task.links : [''] }); setScreen('edit') }}>編集</Btn>
+                  )}
+                </div>
+              )}
             </div>
           )
         })}
@@ -477,35 +600,35 @@ export function TaskListScreen({ trainee, setTrainee, selectedLang, role, setScr
 }
 
 // ── Task Detail ───────────────────────────────────────────────────────────────
-export function TaskDetailScreen({ task, trainee, setTrainee, selectedLang, role, setScreen, setEditTask }) {
+export function TaskDetailScreen({ task, trainee, setTrainee, selectedStep, role, setScreen, setEditTask }) {
   const [newComment, setNewComment] = React.useState('')
   const [localTask, setLocalTask] = React.useState(task)
-  const checkedMap = trainee.checked[selectedLang?.id] || {}
+  const checkedMap = trainee.checked[selectedStep?.id] || {}
   const checked = String(task.id) in checkedMap
   const doneDate = checkedMap[String(task.id)]
 
   function toggleCheck() {
-    const cur = trainee.checked[selectedLang.id] || {}
+    const cur = trainee.checked[selectedStep.id] || {}
     const key = String(task.id)
     const next = key in cur
       ? Object.fromEntries(Object.entries(cur).filter(([k]) => k !== key))
       : { ...cur, [key]: TODAY }
-    setTrainee({ ...trainee, checked: { ...trainee.checked, [selectedLang.id]: next } })
+    setTrainee({ ...trainee, checked: { ...trainee.checked, [selectedStep.id]: next } })
   }
 
   function submitComment() {
     if (!newComment.trim()) return
     const comment = { who: role === 'admin' ? '田中 先輩' : trainee.name, role, date: TODAY, text: newComment.trim() }
-    setLocalTask({ ...localTask, comments: [...localTask.comments, comment] })
+    setLocalTask({ ...localTask, comments: [...(localTask.comments || []), comment] })
     setNewComment('')
   }
 
   return (
     <div className="reveal" style={{ padding: '32px 40px', maxWidth: 780, margin: '0 auto' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, fontSize: 13, color: '#888' }}>
-        <span onClick={() => setScreen('languages')} style={{ cursor: 'pointer', color: '#666' }}>言語選択</span>
+        <span onClick={() => setScreen('curriculum')} style={{ cursor: 'pointer', color: '#666' }}>カリキュラム</span>
         <span>›</span>
-        <span onClick={() => setScreen('tasks')} style={{ cursor: 'pointer', color: '#666' }}>{selectedLang?.name}</span>
+        <span onClick={() => setScreen('tasks')} style={{ cursor: 'pointer', color: '#666' }}>{selectedStep?.label}</span>
         <span>›</span>
         <span style={{ color: '#1a1a1a' }}>課題 {task.no}</span>
       </div>
@@ -513,15 +636,15 @@ export function TaskDetailScreen({ task, trainee, setTrainee, selectedLang, role
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginBottom: 28 }}>
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', gap: 8, marginBottom: 10, alignItems: 'center' }}>
-            <Badge>{selectedLang?.name}</Badge>
-            <Badge color={task.tag === '基礎' ? 'default' : 'yellow'}>{task.tag}</Badge>
+            <Badge>{selectedStep?.label}</Badge>
+            {task.tag && <Badge color="default">{task.tag}</Badge>}
             <span style={{ fontSize: 12, color: '#999' }}>#{task.no}</span>
           </div>
           <h1 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em' }}>{task.title}</h1>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
           {role === 'admin' && (
-            <Btn size="sm" onClick={() => { setEditTask({ ...task, langId: selectedLang.id, links: task.links.length ? task.links : [''] }); setScreen('edit') }}>✏️ 編集</Btn>
+            <Btn size="sm" onClick={() => { setEditTask({ ...task, stepId: selectedStep.id, links: task.links?.length ? task.links : [''] }); setScreen('edit') }}>✏️ 編集</Btn>
           )}
           <div onClick={toggleCheck} style={{
             display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer',
@@ -550,7 +673,7 @@ export function TaskDetailScreen({ task, trainee, setTrainee, selectedLang, role
         <p style={{ color: '#444', lineHeight: 1.8, fontSize: 15 }}>{localTask.desc || '（説明なし）'}</p>
       </Card>
 
-      {localTask.links.length > 0 && (
+      {localTask.links?.length > 0 && (
         <Card style={{ marginBottom: 14 }}>
           <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>参考リンク</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -566,9 +689,9 @@ export function TaskDetailScreen({ task, trainee, setTrainee, selectedLang, role
       )}
 
       <Card>
-        <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14 }}>コメント（{localTask.comments.length}）</div>
-        {localTask.comments.length === 0 && <div style={{ color: '#999', fontSize: 14, marginBottom: 16 }}>コメントはまだありません</div>}
-        {localTask.comments.map((c, i) => (
+        <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14 }}>コメント（{(localTask.comments || []).length}）</div>
+        {(!localTask.comments || localTask.comments.length === 0) && <div style={{ color: '#999', fontSize: 14, marginBottom: 16 }}>コメントはまだありません</div>}
+        {(localTask.comments || []).map((c, i) => (
           <div key={i} style={{ marginBottom: 12, padding: '12px 14px', background: '#f0f0f0', borderRadius: 12, border: '1px solid rgba(0,0,0,0.07)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
               <Avatar name={c.who} size={22} />
@@ -603,12 +726,8 @@ export function TaskEditScreen({ editTask, setScreen }) {
       <Card style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
         <div style={{ display: 'flex', gap: 12 }}>
           <div style={{ flex: 2 }}>
-            <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>言語カテゴリ</div>
-            <Select value={form.langId} onChange={v => f('langId', v)} options={LANGUAGES.map(l => ({ value: l.id, label: l.name }))} />
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>タグ</div>
-            <Select value={form.tag} onChange={v => f('tag', v)} options={[{ value: '基礎', label: '基礎' }, { value: '実案件', label: '実案件' }]} />
+            <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>ステップ</div>
+            <Select value={form.stepId} onChange={v => f('stepId', v)} options={STEPS.map(s => ({ value: s.id, label: `${s.label}: ${s.title}` }))} />
           </div>
           <div style={{ width: 80 }}>
             <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>番号</div>
@@ -682,15 +801,17 @@ export function TraineeManagementScreen({ trainees, setScreen, setSelectedTraine
               </div>
               {isExp && (
                 <div style={{ padding: '0 18px 18px', borderTop: '1px solid rgba(0,0,0,0.07)' }}>
-                  <div style={{ marginTop: 14, marginBottom: 10, fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em' }}>割り当て言語 · 完了率</div>
+                  <div style={{ marginTop: 14, marginBottom: 10, fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em' }}>ステップ別進捗</div>
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                    {LANGUAGES.map(l => {
-                      const p = getProgress(t, l.id)
+                    {STEPS.map(s => {
+                      const p = s.tasks.length ? getProgress(t, s.id) : null
                       return (
-                        <div key={l.id} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 6, background: '#f0f0f0', border: '1px solid rgba(0,0,0,0.07)' }}>
-                          <i className={l.icon} style={{ fontSize: 16 }} />
-                          <span style={{ fontSize: 13, fontWeight: 500 }}>{l.name}</span>
-                          <span style={{ fontSize: 13, color: p === 100 ? '#911619' : '#666', fontWeight: 600 }}>{p}%</span>
+                        <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 6, background: '#f0f0f0', border: '1px solid rgba(0,0,0,0.07)' }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: s.color }}>{s.label}</span>
+                          {p !== null
+                            ? <span style={{ fontSize: 13, color: p === 100 ? '#911619' : '#666', fontWeight: 600 }}>{p}%</span>
+                            : <span style={{ fontSize: 12, color: '#bbb' }}>-</span>
+                          }
                         </div>
                       )
                     })}
@@ -719,18 +840,6 @@ export function TraineeManagementScreen({ trainees, setScreen, setSelectedTraine
           </div>
         </div>
         <div>
-          <div style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>割り当て言語</div>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {LANGUAGES.map(l => (
-              <label key={l.id} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 6, background: '#f0f0f0', border: '1px solid rgba(0,0,0,0.07)', cursor: 'pointer', fontSize: 13 }}>
-                <input type="checkbox" defaultChecked style={{ accentColor: '#911619' }} />
-                <i className={l.icon} style={{ fontSize: 15 }} />
-                <span>{l.name}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-        <div>
           <Btn variant="primary" size="sm" disabled={!newName.trim()}>登録する</Btn>
         </div>
       </Card>
@@ -739,8 +848,9 @@ export function TraineeManagementScreen({ trainees, setScreen, setSelectedTraine
 }
 
 // ── Trainee Detail View ───────────────────────────────────────────────────────
-export function TraineeDetailView({ trainee, setScreen, setSelectedLang }) {
+export function TraineeDetailView({ trainee, setScreen, setSelectedStep }) {
   const overall = getOverallProgress(trainee)
+  const totalTasks = STEPS.reduce((a, s) => a + s.tasks.length, 0)
   return (
     <div className="reveal" style={{ padding: '32px 40px', maxWidth: 800, margin: '0 auto' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, fontSize: 13, color: '#888' }}>
@@ -762,27 +872,31 @@ export function TraineeDetailView({ trainee, setScreen, setSelectedLang }) {
       <Card style={{ marginBottom: 16, padding: '18px 20px' }}>
         <ProgressBar value={overall} height={6} />
         <div style={{ fontSize: 12, color: '#888', marginTop: 6 }}>
-          {getTotalDone(trainee)} / {Object.values(TASKS_DATA).reduce((a,b)=>a+b.length,0)} 課題完了
+          {getTotalDone(trainee)} / {totalTasks} 課題完了
         </div>
       </Card>
-      <SectionTitle>言語ごとの完了率</SectionTitle>
+      <SectionTitle>ステップごとの完了率</SectionTitle>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {LANGUAGES.map(l => {
-          const p = getProgress(trainee, l.id)
-          const tasks = TASKS_DATA[l.id] || []
-          const done = Object.keys(trainee.checked[l.id] || {}).length
+        {STEPS.map(s => {
+          const p = s.tasks.length ? getProgress(trainee, s.id) : null
+          const done = Object.keys(trainee.checked[s.id] || {}).length
           return (
-            <Card key={l.id} onClick={() => { setSelectedLang(l); setScreen('tasks') }} style={{ padding: '14px 18px' }}>
+            <Card key={s.id} onClick={() => { setSelectedStep(s); setScreen('tasks') }} style={{ padding: '14px 18px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                <div style={{ fontSize: 20, width: 32, textAlign: 'center' }}><i className={l.icon} /></div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                    <span style={{ fontWeight: 500 }}>{l.name}</span>
-                    <span style={{ fontSize: 13, color: p === 100 ? '#911619' : '#666' }}>{done} / {tasks.length}</span>
-                  </div>
-                  <ProgressBar value={p} color={p === 100 ? '#911619' : l.color} height={4} />
+                <div style={{ flexShrink: 0, width: 52 }}>
+                  <div style={{ fontSize: 11, fontWeight: 800, color: s.color }}>{s.label}</div>
                 </div>
-                <div style={{ fontSize: 16, fontWeight: 700, color: p === 100 ? '#911619' : '#1a1a1a', width: 44, textAlign: 'right' }}>{p}%</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: p !== null ? 6 : 0 }}>
+                    <span style={{ fontWeight: 500, fontSize: 13 }}>{s.title}</span>
+                    {p !== null && <span style={{ fontSize: 13, color: p === 100 ? '#911619' : '#666' }}>{done} / {s.tasks.length}</span>}
+                    {p === null && <span style={{ fontSize: 12, color: '#bbb' }}>案件による</span>}
+                  </div>
+                  {p !== null && <ProgressBar value={p} color={p === 100 ? '#911619' : s.color} height={4} />}
+                </div>
+                {p !== null && (
+                  <div style={{ fontSize: 16, fontWeight: 700, color: p === 100 ? '#911619' : '#1a1a1a', width: 44, textAlign: 'right' }}>{p}%</div>
+                )}
               </div>
             </Card>
           )
