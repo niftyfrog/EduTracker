@@ -13,7 +13,19 @@
       "Bash(npm create:*)",
       "Bash(npm install:*)",
       "Bash(npm run:*)",
-      "Bash(npx vite:*)"
+      "Bash(npx vite:*)",
+      "Bash(mkdir -p ~/.claude/skills/frontend-design)",
+      "Bash(mv ~/.claude/skills/SKILL.md ~/.claude/skills/LICENSE.txt ~/.claude/skills/frontend-design/)",
+      "Bash(cp -r /Users/hioyuuma/制作物/EduTracker/skills/skills/* ~/.claude/skills/)",
+      "Read(//Users/hioyuuma/.claude/skills/**)",
+      "Bash(cp -r /Users/hioyuuma/制作物/EduTracker/.claude/skills/pr-summary ~/.claude/skills/)",
+      "Bash(cp -r /Users/hioyuuma/制作物/EduTracker/.claude/skills/explain-code ~/.claude/skills/)",
+      "Bash(rm -rf /Users/hioyuuma/制作物/EduTracker/.claude/skills/pr-summary /Users/hioyuuma/制作物/EduTracker/.claude/skills/explain-code)",
+      "Bash(sed -i '' \"s/''#0f0f0f''/''#ffffff''/g\" /Users/hioyuuma/制作物/EduTracker/src/screens.jsx)",
+      "Bash(sed -i '' \"s/color: ''#efefef''/color: ''#1a1a1a''/g\" /Users/hioyuuma/制作物/EduTracker/src/screens.jsx)",
+      "Bash(sed -i '' \"s/''#efefef''/''#1a1a1a''/g\" /Users/hioyuuma/制作物/EduTracker/src/screens.jsx)",
+      "Bash(sed -i '' \"s/color: ''#aaa''/color: ''#888''/g\" /Users/hioyuuma/制作物/EduTracker/src/screens.jsx)",
+      "Bash(sed -i '' \"s/''#252525''/''#ebebeb''/g\" /Users/hioyuuma/制作物/EduTracker/src/screens.jsx)"
     ]
   }
 }

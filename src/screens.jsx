@@ -21,25 +21,24 @@ export function Sidebar({ screen, setScreen, role, user }) {
 
   return (
     <div style={{
-      width: 240, flexShrink: 0, height: '100%',
+      width: 220, flexShrink: 0, height: '100%',
       background: '#ffffff', borderRight: '1px solid rgba(0,0,0,0.07)',
-      boxShadow: '2px 0 12px rgba(0,0,0,0.04)',
       display: 'flex', flexDirection: 'column',
     }}>
       <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{
-            width: 28, height: 28, borderRadius: 6,
-            background: 'rgba(145,22,25,0.12)', border: '1px solid rgba(145,22,25,0.22)',
+            width: 26, height: 26, borderRadius: 6,
+            background: 'rgba(145,22,25,0.15)', border: '1px solid rgba(145,22,25,0.25)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 15, color: '#911619',
+            fontSize: 13, color: '#911619',
           }}>✦</div>
-          <span style={{ fontWeight: 700, fontSize: 15, letterSpacing: '-0.02em' }}>EduTrack</span>
+          <span style={{ fontWeight: 700, fontSize: 14, letterSpacing: '-0.01em', color: '#1a1a1a' }}>EduTrack</span>
         </div>
       </div>
 
-      <nav style={{ flex: 1, padding: '12px 10px', overflow: 'auto' }}>
-        <div style={{ fontSize: 11, color: '#999', textTransform: 'uppercase', letterSpacing: '0.1em', padding: '0 10px', marginBottom: 6 }}>
+      <nav style={{ flex: 1, padding: '10px 8px', overflow: 'auto' }}>
+        <div style={{ fontSize: 10, color: '#bbb', textTransform: 'uppercase', letterSpacing: '0.12em', padding: '0 10px', marginBottom: 8, marginTop: 4 }}>
           {role === 'admin' ? '管理メニュー' : 'メニュー'}
         </div>
         {nav.map(item => {
@@ -47,26 +46,25 @@ export function Sidebar({ screen, setScreen, role, user }) {
           return (
             <div key={item.id} onClick={() => setScreen(item.id)} style={{
               display: 'flex', alignItems: 'center', gap: 10,
-              padding: '8px 10px', borderRadius: 6, marginBottom: 2,
+              padding: '8px 10px', borderRadius: 6, marginBottom: 1,
               cursor: 'pointer', transition: 'all 0.12s',
-              background: active ? 'rgba(145,22,25,0.08)' : item.highlight && !active ? 'rgba(145,22,25,0.03)' : 'transparent',
-              color: active ? '#911619' : '#666',
-              fontSize: 14, fontWeight: active ? 500 : 400,
-              border: item.highlight && !active ? '1px solid rgba(145,22,25,0.1)' : '1px solid transparent',
+              background: active ? 'rgba(145,22,25,0.1)' : 'transparent',
+              color: active ? '#911619' : '#777',
+              fontSize: 13.5, fontWeight: active ? 600 : 400,
             }}>
               {item.label}
-              {active && <div style={{ marginLeft: 'auto', width: 4, height: 4, borderRadius: 99, background: '#911619' }} />}
+              {active && <div style={{ marginLeft: 'auto', width: 3, height: 3, borderRadius: 99, background: '#911619' }} />}
             </div>
           )
         })}
       </nav>
 
-      <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+      <div style={{ padding: '12px 14px', borderTop: '1px solid rgba(0,0,0,0.07)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Avatar name={user.name} size={28} />
+          <Avatar name={user.name} size={26} />
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 13, fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.name}</div>
-            <div style={{ fontSize: 11, color: '#999' }}>{role === 'admin' ? '管理者' : '新人'}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: '#555' }}>{user.name}</div>
+            <div style={{ fontSize: 10.5, color: '#888' }}>{role === 'admin' ? '管理者' : '新人'}</div>
           </div>
         </div>
       </div>
@@ -114,7 +112,7 @@ export function AdminDashboard({ trainees, setScreen, setSelectedTrainee, setSel
               <span style={{ fontWeight: 500 }}>{trainee.name}</span>
               <span style={{ color: '#888' }}> が </span>
               <span style={{ fontSize: 11, fontWeight: 700, padding: '1px 6px', borderRadius: 4, background: 'rgba(0,0,0,0.05)', color: step.color }}>{step.label}</span>
-              <span style={{ color: '#555' }}> {task.title}</span>
+              <span style={{ color: '#888' }}> {task.title}</span>
               <span style={{ color: '#888' }}> を完了</span>
             </div>
             {task.tag && <Badge color={task.tag === '課題' ? 'default' : 'yellow'}>{task.tag}</Badge>}
@@ -222,11 +220,11 @@ function HeatMap({ trainee }) {
         ))}
       </div>
       <div style={{ display: 'flex', gap: 4, alignItems: 'center', marginTop: 10 }}>
-        <span style={{ fontSize: 11, color: '#ccc' }}>少</span>
+        <span style={{ fontSize: 11, color: '#555' }}>少</span>
         {[0, 0.35, 0.65, 1].map((i, idx) => (
           <div key={idx} style={{ width: 14, height: 14, borderRadius: 2, background: i === 0 ? '#ebebeb' : `rgba(145,22,25,${0.2 + i * 0.8})` }} />
         ))}
-        <span style={{ fontSize: 11, color: '#ccc' }}>多</span>
+        <span style={{ fontSize: 11, color: '#555' }}>多</span>
       </div>
     </div>
   )
@@ -325,7 +323,7 @@ export function TraineeDashboard({ trainee, setScreen, setSelectedStep, setSelec
                   <span style={{ fontSize: 11, fontWeight: 700, color: step.color }}>{step.label}</span>
                   <span style={{ marginLeft: 4 }}>{task.title}</span>
                 </div>
-                <div style={{ fontSize: 13, color: '#555', lineHeight: 1.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{comment.text}</div>
+                <div style={{ fontSize: 13, color: '#888', lineHeight: 1.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{comment.text}</div>
               </div>
             ))}
           </div>
@@ -367,7 +365,7 @@ export function StepListScreen({ trainee, role, setScreen, setSelectedStep, setE
                   background: '#ffffff', border: '1px solid rgba(0,0,0,0.08)',
                   transition: 'box-shadow 0.15s, border-color 0.15s',
                 }}
-                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.09)'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.14)' }}
+                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.4)'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.14)' }}
                 onMouseLeave={e => { e.currentTarget.style.boxShadow = ''; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.08)' }}
               >
                 {/* Step badge */}
@@ -416,7 +414,7 @@ export function StepListScreen({ trainee, role, setScreen, setSelectedStep, setE
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <div style={{ flex: 1, maxWidth: 200 }}><ProgressBar value={p} color={p === 100 ? '#911619' : s.color} height={4} /></div>
                       <span style={{ fontSize: 12, color: '#888' }}>{done} / {s.tasks.length} 課題</span>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: p === 100 ? '#911619' : '#444' }}>{p}%</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: p === 100 ? '#911619' : '#1a1a1a' }}>{p}%</span>
                     </div>
                   )}
                   {s.tasks.length === 0 && (
@@ -429,7 +427,7 @@ export function StepListScreen({ trainee, role, setScreen, setSelectedStep, setE
 
               {/* Arrow between steps */}
               {!isLast && (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '6px 0', color: '#ccc', fontSize: 18 }}>↓</div>
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '6px 0', color: '#555', fontSize: 18 }}>↓</div>
               )}
             </div>
           )
@@ -507,7 +505,7 @@ export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScr
               <div style={{ fontSize: 11, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>学習内容</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {selectedStep.topics.map((t, i) => (
-                  <span key={i} style={{ fontSize: 13, color: '#555', padding: '3px 10px', borderRadius: 5, background: '#ffffff', border: '1px solid rgba(0,0,0,0.08)' }}>{t}</span>
+                  <span key={i} style={{ fontSize: 13, color: '#888', padding: '3px 10px', borderRadius: 5, background: '#ffffff', border: '1px solid rgba(0,0,0,0.08)' }}>{t}</span>
                 ))}
               </div>
             </div>
@@ -516,11 +514,11 @@ export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScr
             <div style={{ display: 'flex', gap: 24, marginTop: selectedStep.topics.length ? 10 : 0, fontSize: 13 }}>
               <div>
                 <span style={{ color: '#999', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em' }}>提出方法　</span>
-                <span style={{ color: '#444', fontWeight: 500 }}>{selectedStep.submission}</span>
+                <span style={{ color: '#bbb', fontWeight: 500 }}>{selectedStep.submission}</span>
               </div>
               <div>
                 <span style={{ color: '#999', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em' }}>合否基準　</span>
-                <span style={{ color: '#444', fontWeight: 500 }}>{selectedStep.criteria}</span>
+                <span style={{ color: '#bbb', fontWeight: 500 }}>{selectedStep.criteria}</span>
               </div>
             </div>
           )}
@@ -559,7 +557,7 @@ export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScr
             <div key={task.id} style={{
               display: 'flex', alignItems: 'center', gap: 14,
               padding: '12px 16px', borderRadius: 12,
-              background: isDone ? 'rgba(145,22,25,0.03)' : '#ffffff',
+              background: isDone ? 'rgba(145,22,25,0.04)' : '#ffffff',
               border: `1px solid ${isDone ? 'rgba(145,22,25,0.09)' : 'rgba(0,0,0,0.07)'}`,
               transition: 'all 0.12s',
             }}>
@@ -576,7 +574,7 @@ export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScr
                 onClick={isChecklist ? () => toggleCheck(task.id) : () => { setSelectedTask(task); setScreen('detail') }}
                 style={{ flex: 1, cursor: 'pointer' }}
               >
-                <div style={{ color: isDone ? '#888' : '#1a1a1a', textDecoration: isDone ? 'line-through' : 'none', fontSize: 14, fontWeight: 500 }}>{task.title}</div>
+                <div style={{ color: isDone ? '#666' : '#1a1a1a', textDecoration: isDone ? 'line-through' : 'none', fontSize: 14, fontWeight: 500 }}>{task.title}</div>
                 {doneDate && <div style={{ fontSize: 12, color: '#bbb', marginTop: 1 }}>達成日 {doneDate}</div>}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -662,7 +660,7 @@ export function TaskDetailScreen({ task, trainee, setTrainee, selectedStep, role
             }}>{checked && '✓'}</div>
             <div>
               <span style={{ fontSize: 13, color: checked ? '#911619' : '#666' }}>{checked ? '完了済み' : '未着手'}</span>
-              {doneDate && <div style={{ fontSize: 11, color: '#aaa', marginTop: 1 }}>{doneDate}</div>}
+              {doneDate && <div style={{ fontSize: 11, color: '#888', marginTop: 1 }}>{doneDate}</div>}
             </div>
           </div>
         </div>
@@ -670,7 +668,7 @@ export function TaskDetailScreen({ task, trainee, setTrainee, selectedStep, role
 
       <Card style={{ marginBottom: 14 }}>
         <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>説明</div>
-        <p style={{ color: '#444', lineHeight: 1.8, fontSize: 15 }}>{localTask.desc || '（説明なし）'}</p>
+        <p style={{ color: '#bbb', lineHeight: 1.8, fontSize: 15 }}>{localTask.desc || '（説明なし）'}</p>
       </Card>
 
       {localTask.links?.length > 0 && (
@@ -699,7 +697,7 @@ export function TaskDetailScreen({ task, trainee, setTrainee, selectedStep, role
               <Badge color={c.role === 'admin' ? 'blue' : 'default'}>{c.role === 'admin' ? '管理者' : '新人'}</Badge>
               <span style={{ fontSize: 12, color: '#999', marginLeft: 'auto' }}>{relativeDate(c.date)}</span>
             </div>
-            <p style={{ fontSize: 14, color: '#444', lineHeight: 1.6 }}>{c.text}</p>
+            <p style={{ fontSize: 14, color: '#bbb', lineHeight: 1.6 }}>{c.text}</p>
           </div>
         ))}
         <Divider style={{ margin: '14px 0' }} />

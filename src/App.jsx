@@ -78,11 +78,11 @@ export default function App() {
         padding: '0 20px', gap: 12,
         borderBottom: '1px solid rgba(0,0,0,0.07)',
         background: '#ffffff',
-        boxShadow: '0 1px 8px rgba(0,0,0,0.06)',
+        boxShadow: '0 1px 8px rgba(0,0,0,0.05)',
       }}>
         <div style={{ flex: 1 }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 12, color: '#999', textTransform: 'uppercase', letterSpacing: '0.06em' }}>切り替え</span>
+          <span style={{ fontSize: 11, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em' }}>切り替え</span>
           <div style={{ display: 'flex', border: '1px solid rgba(0,0,0,0.1)', borderRadius: 6, overflow: 'hidden' }}>
             {[{ id: 'admin', label: '管理者' }, { id: 'trainee', label: '新人' }].map(r => (
               <button key={r.id} onClick={() => switchRole(r.id)} style={{
@@ -104,7 +104,7 @@ export default function App() {
       {/* Body */}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         <Sidebar screen={screen} setScreen={setScreen} role={role} user={currentUser} />
-        <main style={{ flex: 1, overflow: 'auto', background: 'rgb(248, 248, 248)' }}>
+        <main style={{ flex: 1, overflow: 'auto', background: '#f4f4f4' }}>
           {renderScreen()}
         </main>
       </div>

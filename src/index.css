@@ -1,15 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
 body {
-  font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #f8f8f8;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f4f4f4;
   color: #1a1a1a;
   font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 #root { height: 100%; }
-::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 99px; }
 * { scrollbar-width: thin; scrollbar-color: #ccc transparent; }
@@ -20,7 +22,6 @@ a { color: #911619; text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 h1, h2, h3 {
-  font-stretch: 96%;
   line-height: 1.15;
   letter-spacing: -0.025em;
   text-wrap: pretty;
@@ -28,11 +29,11 @@ h1, h2, h3 {
 p, li { line-height: 1.7; }
 
 @keyframes reveal {
-  from { opacity: 0; filter: blur(10px); transform: translateY(7px); }
-  to   { opacity: 1; filter: blur(0px);  transform: translateY(0);   }
+  from { opacity: 0; filter: blur(8px); transform: translateY(6px); }
+  to   { opacity: 1; filter: blur(0px); transform: translateY(0); }
 }
 .reveal {
-  animation: reveal 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: reveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .reveal-d1 { animation-delay: 0.05s; }
 .reveal-d2 { animation-delay: 0.12s; }

@@ -2,17 +2,17 @@ import React from 'react'
 
 // ─── Design tokens ──────────────────────────────────────────────────────────
 export const N = {
-  bg: '#f8f8f8',
+  bg: '#f4f4f4',
   surface: '#ffffff',
   surface2: '#f0f0f0',
   surface3: '#e8e8e8',
-  border: 'rgba(0,0,0,0.09)',
-  border2: 'rgba(0,0,0,0.12)',
+  border: 'rgba(0,0,0,0.08)',
+  border2: 'rgba(0,0,0,0.13)',
   text: '#1a1a1a',
   muted: '#666',
-  muted2: '#888',
+  muted2: '#999',
   green: '#911619',
-  greenDim: 'rgba(145,22,25,0.09)',
+  greenDim: 'rgba(145,22,25,0.08)',
   greenGlow: 'rgba(145,22,25,0.12)',
   red: '#ff6b6b',
   redDim: 'rgba(255,107,107,0.1)',
@@ -30,7 +30,7 @@ export function ProgressBar({ value, color = N.green, height = 4 }) {
         background: color,
         borderRadius: 99,
         transition: 'width 0.6s ease',
-        boxShadow: `0 0 8px ${color}66`,
+        boxShadow: `0 0 8px ${color}55`,
       }} />
     </div>
   )
@@ -39,10 +39,10 @@ export function ProgressBar({ value, color = N.green, height = 4 }) {
 export function Badge({ children, color = 'default' }) {
   const map = {
     default: { bg: N.surface3, color: N.muted, border: N.border },
-    green:  { bg: '#fdf0f0', color: '#911619', border: 'rgba(145,22,25,0.18)' },
-    blue:   { bg: '#eff6ff', color: '#2563a8', border: 'rgba(37,99,168,0.2)' },
-    red:    { bg: '#fdf0f0', color: '#911619', border: 'rgba(145,22,25,0.2)' },
-    yellow: { bg: '#fdf0f0', color: '#911619', border: 'rgba(145,22,25,0.15)' },
+    green:   { bg: 'rgba(145,22,25,0.07)', color: '#911619', border: 'rgba(145,22,25,0.18)' },
+    blue:    { bg: '#eff6ff', color: '#2563a8', border: 'rgba(37,99,168,0.2)' },
+    red:     { bg: 'rgba(145,22,25,0.07)', color: '#911619', border: 'rgba(145,22,25,0.18)' },
+    yellow:  { bg: 'rgba(245,197,66,0.12)', color: '#9a6a00', border: 'rgba(245,197,66,0.3)' },
   }
   const s = map[color] || map.default
   return (
@@ -65,13 +65,13 @@ export function Card({ children, style = {}, onClick }) {
       onMouseEnter={() => onClick && setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{
-        background: hover && onClick ? N.surface2 : N.surface,
-        border: `1px solid ${hover ? N.border2 : N.border}`,
+        background: hover && onClick ? '#fafafa' : N.surface,
+        border: `1px solid ${hover && onClick ? N.border2 : N.border}`,
         borderRadius: 12,
         padding: '16px 20px',
         cursor: onClick ? 'pointer' : 'default',
         transition: 'border-color 0.15s, background 0.15s, box-shadow 0.15s',
-        boxShadow: hover && onClick ? '0 4px 16px rgba(0,0,0,0.09)' : '0 1px 4px rgba(0,0,0,0.05)',
+        boxShadow: hover && onClick ? '0 4px 16px rgba(0,0,0,0.08)' : '0 1px 3px rgba(0,0,0,0.05)',
         ...style,
       }}>
       {children}
@@ -96,11 +96,11 @@ export function Btn({ children, onClick, variant = 'default', size = 'md', style
     default: {
       background: hover ? N.surface3 : N.surface2, color: N.text,
       border: `1px solid ${N.border}`,
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 1px 3px rgba(0,0,0,0.07)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8), 0 1px 3px rgba(0,0,0,0.07)',
     },
     primary: {
       background: hover ? '#7a1215' : '#911619', color: '#fff',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.15), 0 0 0 1px rgba(0,0,0,0.15), 0 2px 6px rgba(145,22,25,0.25)',
+      boxShadow: '0 0 0 1px rgba(0,0,0,0.12), 0 2px 6px rgba(145,22,25,0.25)',
     },
     ghost:  { background: hover ? N.surface2 : 'transparent', color: N.muted },
     danger: { background: hover ? N.redDim : 'transparent', color: N.red, border: `1px solid rgba(255,107,107,0.2)` },
@@ -173,7 +173,7 @@ export function Avatar({ name, size = 32 }) {
   return (
     <div style={{
       width: size, height: size, borderRadius: '50%',
-      background: N.greenDim, border: `1px solid rgba(145,22,25,0.28)`,
+      background: N.greenDim, border: `1px solid rgba(145,22,25,0.22)`,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontSize: size * 0.4, fontWeight: 600, color: N.green,
       flexShrink: 0,
@@ -186,7 +186,7 @@ export function Avatar({ name, size = 32 }) {
 export function SectionTitle({ children, action }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-      <h2 style={{ fontSize: 14, fontWeight: 500, color: N.muted, textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>{children}</h2>
+      <h2 style={{ fontSize: 11, fontWeight: 600, color: N.muted2, textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>{children}</h2>
       {action}
     </div>
   )
@@ -199,9 +199,9 @@ export function Divider({ style = {} }) {
 export function StatCard({ label, value, suffix = '', color = N.text }) {
   return (
     <Card style={{ flex: 1 }}>
-      <div style={{ fontSize: 12, color: N.muted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{label}</div>
+      <div style={{ fontSize: 11, color: N.muted2, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>{label}</div>
       <div style={{ fontSize: 28, fontWeight: 700, color, fontVariantNumeric: 'tabular-nums' }}>
-        {value}<span style={{ fontSize: 15, fontWeight: 400, color: N.muted, marginLeft: 2 }}>{suffix}</span>
+        {value}<span style={{ fontSize: 14, fontWeight: 400, color: N.muted, marginLeft: 2 }}>{suffix}</span>
       </div>
     </Card>
   )
