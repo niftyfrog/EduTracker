@@ -1,25 +1,31 @@
 import React from 'react'
+import * as db from './lib/db'
+import { Icon } from './components'
 
 const AI_LANGUAGES = ['C#', 'SQL', 'Java']
 const AI_TAGS = ['基礎', '実案件']
 
-export function AIGenerateScreen({ role }) {
+export function AIGenerateScreen({ role, userId }) {
   const [lang, setLangState] = React.useState('C#')
   const [tag, setTag] = React.useState('基礎')
   const [context, setContext] = React.useState('')
   const [generating, setGenerating] = React.useState(false)
   const [draft, setDraft] = React.useState(null)
   const [editedDraft, setEditedDraft] = React.useState(null)
-  const [pendingTasks, setPendingTasks] = React.useState(() => {
-    try { return JSON.parse(localStorage.getItem('ai-pending-tasks') || '[]') } catch { return [] }
-  })
-  const [approvedTasks, setApprovedTasks] = React.useState(() => {
-    try { return JSON.parse(localStorage.getItem('ai-approved-tasks') || '[]') } catch { return [] }
-  })
+  const [allTasks, setAllTasks] = React.useState([])
+  const [loadingTasks, setLoadingTasks] = React.useState(true)
   const [activeTab, setActiveTab] = React.useState('generate')
 
-  function savePending(tasks) { setPendingTasks(tasks); localStorage.setItem('ai-pending-tasks', JSON.stringify(tasks)) }
-  function saveApproved(tasks) { setApprovedTasks(tasks); localStorage.setItem('ai-approved-tasks', JSON.stringify(tasks)) }
+  // Load all AI tasks from DB
+  React.useEffect(() => {
+    db.fetchAiTasks()
+      .then(setAllTasks)
+      .catch(console.error)
+      .finally(() => setLoadingTasks(false))
+  }, [])
+
+  const pendingTasks = allTasks.filter(t => t.status === 'pending')
+  const approvedTasks = allTasks.filter(t => t.status === 'approved')
 
   async function generate() {
     setGenerating(true)
@@ -36,7 +42,7 @@ export function AIGenerateScreen({ role }) {
         parsed = match ? JSON.parse(match[0]) : null
       }
       if (parsed) {
-        const d = { ...parsed, lang, tag, id: Date.now(), status: 'draft' }
+        const d = { ...parsed, lang, tag, status: 'draft' }
         setDraft(d)
         setEditedDraft(d)
       }
@@ -48,19 +54,38 @@ export function AIGenerateScreen({ role }) {
     }
   }
 
-  function submitForApproval() {
-    if (!editedDraft) return
-    const task = { ...editedDraft, status: 'pending', submittedAt: new Date().toLocaleString('ja-JP') }
-    savePending([task, ...pendingTasks])
-    setDraft(null); setEditedDraft(null); setContext(''); setActiveTab('pending')
+  async function submitForApproval() {
+    if (!editedDraft || !userId) return
+    try {
+      const created = await db.createAiTask({ ...editedDraft, userId })
+      setAllTasks(prev => [created, ...prev])
+      setDraft(null); setEditedDraft(null); setContext(''); setActiveTab('pending')
+    } catch (e) {
+      console.error(e)
+      alert('承認申請の送信に失敗しました。')
+    }
   }
-  function approveTask(taskId) {
-    const task = pendingTasks.find(t => t.id === taskId)
-    if (!task) return
-    saveApproved([{ ...task, status: 'approved', approvedAt: new Date().toLocaleString('ja-JP') }, ...approvedTasks])
-    savePending(pendingTasks.filter(t => t.id !== taskId))
+
+  async function approveTask(taskId) {
+    try {
+      await db.updateAiTaskStatus(taskId, 'approved', userId)
+      setAllTasks(prev => prev.map(t => t.id === taskId
+        ? { ...t, status: 'approved', approved_at: new Date().toISOString() }
+        : t
+      ))
+    } catch (e) {
+      console.error(e)
+    }
   }
-  function rejectTask(taskId) { savePending(pendingTasks.filter(t => t.id !== taskId)) }
+
+  async function rejectTask(taskId) {
+    try {
+      await db.updateAiTaskStatus(taskId, 'rejected', userId)
+      setAllTasks(prev => prev.filter(t => t.id !== taskId))
+    } catch (e) {
+      console.error(e)
+    }
+  }
 
   const tabStyle = (id) => ({
     padding: '8px 16px', border: 'none', cursor: 'pointer',
@@ -83,14 +108,14 @@ export function AIGenerateScreen({ role }) {
       </div>
 
       <div style={{ borderBottom: '1px solid rgba(0,0,0,0.08)', marginBottom: 24, display: 'flex', gap: 4 }}>
-        <button style={tabStyle('generate')} onClick={() => setActiveTab('generate')}>✨ 生成</button>
+        <button style={tabStyle('generate')} onClick={() => setActiveTab('generate')}><Icon name="sparkle" size={13} style={{ marginRight: 4 }} />生成</button>
         <button style={tabStyle('pending')} onClick={() => setActiveTab('pending')}>
-          ⏳ 承認待ち
+          <Icon name="hourglass" size={13} style={{ marginRight: 4 }} />承認待ち
           {pendingTasks.length > 0 && (
             <span style={{ marginLeft: 6, background: '#911619', color: '#fff', borderRadius: 99, fontSize: 10, padding: '1px 6px', fontWeight: 700 }}>{pendingTasks.length}</span>
           )}
         </button>
-        <button style={tabStyle('approved')} onClick={() => setActiveTab('approved')}>✅ 承認済み ({approvedTasks.length})</button>
+        <button style={tabStyle('approved')} onClick={() => setActiveTab('approved')}><Icon name="check-circle" size={13} style={{ marginRight: 4 }} />承認済み ({approvedTasks.length})</button>
       </div>
 
       {activeTab === 'generate' && (
@@ -135,7 +160,7 @@ export function AIGenerateScreen({ role }) {
                 color: generating || role !== 'admin' ? '#aaa' : '#fff',
                 fontSize: 13, fontWeight: 700, fontFamily: 'inherit', transition: 'all 0.15s',
               }}>
-                {generating ? '⏳ 生成中...' : '✨ AIで課題を生成'}
+                {generating ? <><Icon name="hourglass" size={13} style={{ marginRight: 4, filter: 'brightness(10)' }} />生成中...</> : <><Icon name="sparkle" size={13} style={{ marginRight: 4, filter: 'brightness(10)' }} />AIで課題を生成</>}
               </button>
               {role !== 'admin' && <div style={{ fontSize: 11, color: '#aaa', textAlign: 'center' }}>管理者のみ使用可能</div>}
             </div>
@@ -144,7 +169,7 @@ export function AIGenerateScreen({ role }) {
           <div style={{ flex: 1 }}>
             {!draft && !generating && (
               <div style={{ border: '2px dashed rgba(0,0,0,0.1)', borderRadius: 12, padding: '48px 32px', textAlign: 'center', color: '#bbb', display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
-                <div style={{ fontSize: 40 }}>✨</div>
+                <div><Icon name="sparkle" size={40} /></div>
                 <div style={{ fontSize: 14 }}>左の条件を設定してAIで課題を生成</div>
                 <div style={{ fontSize: 12 }}>Claude Haikuが課題の下書きを自動作成します</div>
               </div>
@@ -159,7 +184,7 @@ export function AIGenerateScreen({ role }) {
             {draft && editedDraft && (
               <div style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 12, overflow: 'hidden' }}>
                 <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(0,0,0,0.07)', background: '#fafafa', display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: '#911619' }}>✨ AI生成下書き</span>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: '#911619', display: 'flex', alignItems: 'center', gap: 4 }}><Icon name="sparkle" size={12} />AI生成下書き</span>
                   <span style={{ fontSize: 10, color: '#aaa', marginLeft: 'auto' }}>内容を確認・編集してから承認申請してください</span>
                 </div>
                 <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -191,13 +216,13 @@ export function AIGenerateScreen({ role }) {
                     <div>
                       <div style={{ fontSize: 11, color: '#888', marginBottom: 5 }}>参考リンク</div>
                       {editedDraft.links.map((url, i) => (
-                        <div key={i} style={{ fontSize: 12, color: '#911619', marginBottom: 2 }}>🔗 {url}</div>
+                        <div key={i} style={{ fontSize: 12, color: '#911619', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 4 }}><Icon name="link" size={11} /> {url}</div>
                       ))}
                     </div>
                   )}
                   <div style={{ display: 'flex', gap: 8, paddingTop: 4, borderTop: '1px solid rgba(0,0,0,0.07)' }}>
                     <button onClick={() => { setDraft(null); setEditedDraft(null) }} style={{ flex: 1, padding: '8px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.1)', background: '#fff', color: '#888', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>破棄</button>
-                    <button onClick={generate} style={{ flex: 1, padding: '8px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.1)', background: '#fff', color: '#666', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>🔄 再生成</button>
+                    <button onClick={generate} style={{ flex: 1, padding: '8px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.1)', background: '#fff', color: '#666', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}><Icon name="refresh" size={12} /> 再生成</button>
                     <button onClick={submitForApproval} style={{ flex: 2, padding: '8px', borderRadius: 8, border: 'none', background: '#911619', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>承認申請する →</button>
                   </div>
                 </div>
@@ -209,17 +234,18 @@ export function AIGenerateScreen({ role }) {
 
       {activeTab === 'pending' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {pendingTasks.length === 0 && (
+          {loadingTasks && <div style={{ color: '#bbb', textAlign: 'center', padding: 24 }}>読込中...</div>}
+          {!loadingTasks && pendingTasks.length === 0 && (
             <div style={{ textAlign: 'center', padding: '48px', color: '#bbb' }}>
-              <div style={{ fontSize: 36, marginBottom: 12 }}>⏳</div>
+              <div style={{ marginBottom: 12 }}><Icon name="hourglass" size={36} /></div>
               <div>承認待ちの課題はありません</div>
             </div>
           )}
           {pendingTasks.map(task => (
             <div key={task.id} style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 12, overflow: 'hidden' }}>
               <div style={{ padding: '14px 18px', borderBottom: '1px solid rgba(0,0,0,0.07)', background: '#fffdf0', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 11, color: '#b45309', fontWeight: 600 }}>⏳ 承認待ち</span>
-                <span style={{ fontSize: 10, color: '#aaa', marginLeft: 'auto' }}>{task.submittedAt}</span>
+                <span style={{ fontSize: 11, color: '#b45309', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}><Icon name="hourglass" size={11} />承認待ち</span>
+                <span style={{ fontSize: 10, color: '#aaa', marginLeft: 'auto' }}>{task.created_at ? new Date(task.created_at).toLocaleString('ja-JP') : ''}</span>
                 <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 4, background: 'rgba(145,22,25,0.08)', color: '#911619', fontWeight: 600 }}>{task.lang}</span>
                 <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 4, background: '#f0f0f0', color: '#666' }}>{task.tag}</span>
               </div>
@@ -248,7 +274,7 @@ export function AIGenerateScreen({ role }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {approvedTasks.length === 0 && (
             <div style={{ textAlign: 'center', padding: '48px', color: '#bbb' }}>
-              <div style={{ fontSize: 36, marginBottom: 12 }}>✅</div>
+              <div style={{ marginBottom: 12 }}><Icon name="check-circle" size={36} /></div>
               <div>承認済みの課題はまだありません</div>
             </div>
           )}
@@ -260,7 +286,7 @@ export function AIGenerateScreen({ role }) {
                 <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                   <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 3, background: 'rgba(145,22,25,0.08)', color: '#911619', fontWeight: 600 }}>{task.lang}</span>
                   <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 3, background: '#f0f0f0', color: '#666' }}>{task.tag}</span>
-                  <span style={{ fontSize: 10, color: '#bbb', marginLeft: 'auto' }}>承認日時: {task.approvedAt}</span>
+                  {task.approved_at && <span style={{ fontSize: 10, color: '#bbb', marginLeft: 'auto' }}>承認日時: {new Date(task.approved_at).toLocaleString('ja-JP')}</span>}
                 </div>
               </div>
             </div>

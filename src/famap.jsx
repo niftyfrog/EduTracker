@@ -1,10 +1,11 @@
 import React from 'react'
+import { Icon } from './components'
 
 // ─── FA System Map ────────────────────────────────────────────────────────────
 
 const FA_NODES = [
   {
-    id: 'sensor', label: 'センサー層', icon: '📡',
+    id: 'sensor', label: 'センサー層', icon: 'satellite',
     tech: ['SQL', 'Oracle'], color: '#5b8dee',
     x: 110, y: 180, deps: [],
     desc: '現場センサーからリアルタイムデータを収集。SQL/Oracleで生データを蓄積・管理する。',
@@ -17,7 +18,7 @@ const FA_NODES = [
     ],
   },
   {
-    id: 'plc', label: 'PLC制御', icon: '⚙️',
+    id: 'plc', label: 'PLC制御', icon: 'gear',
     tech: ['C#'], color: '#911619',
     x: 330, y: 80, deps: ['sensor'],
     desc: 'PLC（プログラマブルロジックコントローラ）をC#で制御。センサー値に基づき機械動作を命令する。',
@@ -30,7 +31,7 @@ const FA_NODES = [
     ],
   },
   {
-    id: 'scada', label: 'SCADA監視', icon: '🖥️',
+    id: 'scada', label: 'SCADA監視', icon: 'monitor',
     tech: ['VB.NET'], color: '#2d7a4f',
     x: 560, y: 60, deps: ['plc'],
     desc: 'SCADAシステムをVB.NETで構築。FA全体を監視・操作するHMI（Human Machine Interface）を提供する。',
@@ -43,7 +44,7 @@ const FA_NODES = [
     ],
   },
   {
-    id: 'db', label: 'データベース', icon: '🗄️',
+    id: 'db', label: 'データベース', icon: 'database',
     tech: ['SQL', 'Oracle'], color: '#b45309',
     x: 330, y: 300, deps: ['sensor'],
     desc: '生産データの永続化・管理。トランザクション・インデックス最適化でFA環境の高速クエリを実現。',
@@ -56,7 +57,7 @@ const FA_NODES = [
     ],
   },
   {
-    id: 'report', label: 'レポート生成', icon: '📊',
+    id: 'report', label: 'レポート生成', icon: 'chart',
     tech: ['Java', 'SQL', 'Oracle'], color: '#6d28d9',
     x: 560, y: 310, deps: ['db'],
     desc: 'Javaで生産レポートを自動生成。DBから集計したデータをPDF・Excelとして出力する。',
@@ -69,7 +70,7 @@ const FA_NODES = [
     ],
   },
   {
-    id: 'api', label: '外部API連携', icon: '🔌',
+    id: 'api', label: '外部API連携', icon: 'plug',
     tech: ['C#'], color: '#0891b2',
     x: 760, y: 185, deps: ['plc', 'db'],
     desc: 'C#でERPや在庫システムと連携。生産データをリアルタイムに外部システムへ同期する。',
@@ -148,8 +149,9 @@ function FANode({ node, selected, unlocked, progress, onClick, justUnlocked }) {
       )}
       <rect x={node.x} y={node.y} width={W} height={4} rx={2}
         fill={unlocked ? node.color : '#ccc'} opacity={unlocked ? 1 : 0.5} />
-      <text x={node.x + 12} y={node.y + 26} fontSize={16} dominantBaseline="middle"
-        style={{ userSelect: 'none' }}>{node.icon}</text>
+      <foreignObject x={node.x + 8} y={node.y + 14} width={24} height={24}>
+        <Icon name={node.icon} size={20} />
+      </foreignObject>
       <text x={node.x + 34} y={node.y + 26} fontSize={12} fontWeight={600}
         fill={unlocked ? '#1a1a1a' : '#aaa'} dominantBaseline="middle"
         fontFamily="inherit" style={{ userSelect: 'none' }}>{node.label}</text>
@@ -172,8 +174,11 @@ function FANode({ node, selected, unlocked, progress, onClick, justUnlocked }) {
         fill={unlocked ? node.color : '#ccc'} fontWeight={700} dominantBaseline="middle"
         fontFamily="inherit" style={{ userSelect: 'none' }}>{pct}%</text>
       {!unlocked && (
-        <text x={cx} y={node.y + H + 14} fontSize={11} textAnchor="middle"
-          fill="#bbb" fontFamily="inherit" style={{ userSelect: 'none' }}>🔒 ロック中</text>
+        <foreignObject x={cx - 40} y={node.y + H + 4} width={80} height={20}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3, fontSize: 11, color: '#bbb', fontFamily: 'inherit' }}>
+            <Icon name="lock" size={11} /> ロック中
+          </div>
+        </foreignObject>
       )}
       {complete && (
         <text x={cx} y={node.y + H + 14} fontSize={11} textAnchor="middle"
@@ -186,7 +191,7 @@ function FANode({ node, selected, unlocked, progress, onClick, justUnlocked }) {
 function FAPanel({ node, nodeStates, setNodeStates }) {
   if (!node) return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#bbb', gap: 12 }}>
-      <div style={{ fontSize: 48 }}>🏭</div>
+      <div><Icon name="factory" size={48} /></div>
       <div style={{ fontSize: 14 }}>コンポーネントをクリックして詳細を表示</div>
     </div>
   )
@@ -281,11 +286,11 @@ function FACompleteBanner() {
       flexDirection: 'column', gap: 16,
       animation: 'reveal 0.6s cubic-bezier(0.22,1,0.36,1) both',
     }}>
-      <div style={{ fontSize: 64 }}>🏭</div>
+      <div><Icon name="factory" size={64} /></div>
       <div style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.03em', color: '#911619' }}>FAシステム完全稼働！</div>
       <div style={{ fontSize: 14, color: '#666' }}>すべてのコンポーネントが完成しました</div>
       <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-        {FA_NODES.map(n => <span key={n.id} style={{ fontSize: 24 }}>{n.icon}</span>)}
+        {FA_NODES.map(n => <Icon key={n.id} name={n.icon} size={24} />)}
       </div>
     </div>
   )

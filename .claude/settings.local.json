@@ -25,7 +25,9 @@
       "Bash(sed -i '' \"s/color: ''#efefef''/color: ''#1a1a1a''/g\" /Users/hioyuuma/制作物/EduTracker/src/screens.jsx)",
       "Bash(sed -i '' \"s/''#efefef''/''#1a1a1a''/g\" /Users/hioyuuma/制作物/EduTracker/src/screens.jsx)",
       "Bash(sed -i '' \"s/color: ''#aaa''/color: ''#888''/g\" /Users/hioyuuma/制作物/EduTracker/src/screens.jsx)",
-      "Bash(sed -i '' \"s/''#252525''/''#ebebeb''/g\" /Users/hioyuuma/制作物/EduTracker/src/screens.jsx)"
+      "Bash(sed -i '' \"s/''#252525''/''#ebebeb''/g\" /Users/hioyuuma/制作物/EduTracker/src/screens.jsx)",
+      "Bash(ls:*)",
+      "Bash(VITE_SUPABASE_URL=https://test.supabase.co VITE_SUPABASE_ANON_KEY=test npm run build 2>&1)"
     ]
   }
 }

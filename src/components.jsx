@@ -21,6 +21,20 @@ export const N = {
   yellow: '#f5c542',
 }
 
+// ─── Icon ────────────────────────────────────────────────────────────────────
+const iconModules = import.meta.glob('./assets/icons/*.svg', { eager: true, query: '?url', import: 'default' })
+const iconMap = {}
+for (const [path, url] of Object.entries(iconModules)) {
+  const name = path.split('/').pop().replace('.svg', '')
+  iconMap[name] = url
+}
+
+export function Icon({ name, size = 16, style, className }) {
+  const src = iconMap[name]
+  if (!src) return null
+  return <img src={src} alt="" width={size} height={size} style={{ display: 'inline-block', verticalAlign: 'middle', ...style }} className={className} />
+}
+
 export function ProgressBar({ value, color = N.green, height = 4 }) {
   return (
     <div style={{ background: N.surface3, borderRadius: 99, height, overflow: 'hidden' }}>

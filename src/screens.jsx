@@ -1,6 +1,8 @@
 import React from 'react'
-import { STEPS, getProgress, getOverallProgress, getCompletionDates, getRecentCompletions, getTraineeNotifications, relativeDate, getTotalDone, TODAY } from './data'
-import { N, ProgressBar, Badge, Card, Btn, Input, Select, Textarea, Avatar, SectionTitle, Divider, StatCard } from './components'
+import { createPortal } from 'react-dom'
+import { getProgress, getOverallProgress, getCompletionDates, getRecentCompletions, relativeDate, getTotalDone, TODAY } from './data'
+import { MarkdownRenderer, MarkdownEditor } from './Markdown'
+import { N, ProgressBar, Badge, Card, Btn, Input, Select, Textarea, Avatar, SectionTitle, Divider, StatCard, Icon } from './components'
 
 // ── Sidebar ──────────────────────────────────────────────────────────────────
 export function Sidebar({ screen, setScreen, role, user }) {
@@ -73,22 +75,23 @@ export function Sidebar({ screen, setScreen, role, user }) {
 }
 
 // ── Admin Dashboard ───────────────────────────────────────────────────────────
-export function AdminDashboard({ trainees, setScreen, setSelectedTrainee, setSelectedStep }) {
-  const recentCompletions = getRecentCompletions(trainees, 7)
-  const totalTasks = STEPS.reduce((a, s) => a + s.tasks.length, 0)
+export function AdminDashboard({ trainees, steps, setScreen, setSelectedTrainee, setSelectedStep, currentUser }) {
+  const recentCompletions = getRecentCompletions(trainees, 7, steps)
+  const totalTasks = steps.reduce((a, s) => a + s.tasks.length, 0)
+  const adminFirstName = currentUser?.name?.split(' ')[0] || '管理者'
 
   return (
-    <div className="reveal" style={{ padding: '32px 40px', maxWidth: 960, margin: '0 auto' }}>
+    <div className="reveal" style={{ padding: '20px 28px', maxWidth: 960, margin: '0 auto' }}>
       <div style={{ marginBottom: 32 }}>
         <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>管理者ダッシュボード</div>
-        <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.03em' }}>おはようございます、田中さん</h1>
+        <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.03em' }}>おはようございます、{adminFirstName}さん</h1>
       </div>
 
-      <div style={{ display: 'flex', gap: 12, marginBottom: 28 }}>
+      <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
         <StatCard label="担当新人" value={trainees.length} suffix="名" />
         <StatCard label="課題総数" value={totalTasks} suffix="件" />
         <StatCard label="平均完了率"
-          value={Math.round(trainees.reduce((a, t) => a + getOverallProgress(t), 0) / trainees.length)}
+          value={trainees.length ? Math.round(trainees.reduce((a, t) => a + getOverallProgress(t, steps), 0) / trainees.length) : 0}
           suffix="%" color="#911619" />
       </div>
 
@@ -98,7 +101,7 @@ export function AdminDashboard({ trainees, setScreen, setSelectedTrainee, setSel
           <span style={{ fontSize: 11, fontWeight: 600, color: '#fff', background: '#911619', borderRadius: 99, padding: '1px 7px' }}>{recentCompletions.length}</span>
         )}
       </div>
-      <Card style={{ padding: 0, overflow: 'hidden', marginBottom: 28 }}>
+      <Card style={{ padding: 0, overflow: 'hidden', marginBottom: 16 }}>
         {recentCompletions.length === 0 && (
           <div style={{ padding: '16px 20px', fontSize: 13, color: '#bbb' }}>今週の達成はまだありません</div>
         )}
@@ -124,7 +127,7 @@ export function AdminDashboard({ trainees, setScreen, setSelectedTrainee, setSel
       <SectionTitle>担当新人の進捗</SectionTitle>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {trainees.map(t => {
-          const overall = getOverallProgress(t)
+          const overall = getOverallProgress(t, steps)
           return (
             <Card key={t.id} style={{ padding: 0, overflow: 'hidden' }}>
               <div style={{ padding: '16px 20px' }}>
@@ -142,8 +145,8 @@ export function AdminDashboard({ trainees, setScreen, setSelectedTrainee, setSel
                 </div>
                 <ProgressBar value={overall} />
                 <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
-                  {STEPS.filter(s => s.tasks.length > 0).map(s => {
-                    const p = getProgress(t, s.id)
+                  {steps.filter(s => s.tasks.length > 0).map(s => {
+                    const p = getProgress(t, s.id, steps)
                     return (
                       <div key={s.id} onClick={() => { setSelectedTrainee(t); setSelectedStep(s); setScreen('tasks') }}
                         style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5,
@@ -231,13 +234,12 @@ function HeatMap({ trainee }) {
 }
 
 // ── Trainee Dashboard ─────────────────────────────────────────────────────────
-export function TraineeDashboard({ trainee, setScreen, setSelectedStep, setSelectedTask }) {
-  const overall = getOverallProgress(trainee)
-  const notifications = getTraineeNotifications()
-  const totalTasks = STEPS.reduce((a, s) => a + s.tasks.length, 0)
+export function TraineeDashboard({ trainee, steps, notifications, setScreen, setSelectedStep, setSelectedTask }) {
+  const overall = getOverallProgress(trainee, steps)
+  const totalTasks = steps.reduce((a, s) => a + s.tasks.length, 0)
 
   return (
-    <div className="reveal" style={{ padding: '32px 40px', maxWidth: 800, margin: '0 auto' }}>
+    <div className="reveal" style={{ padding: '20px 28px', maxWidth: 800, margin: '0 auto' }}>
       <div style={{ marginBottom: 32 }}>
         <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>マイダッシュボード</div>
         <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.03em' }}>こんにちは、{trainee.name.split(' ')[0]}さん</h1>
@@ -260,8 +262,8 @@ export function TraineeDashboard({ trainee, setScreen, setSelectedStep, setSelec
 
       <SectionTitle>ステップごとの完了率</SectionTitle>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {STEPS.map(s => {
-          const p = s.tasks.length ? getProgress(trainee, s.id) : null
+        {steps.map(s => {
+          const p = s.tasks.length ? getProgress(trainee, s.id, steps) : null
           const done = Object.keys(trainee.checked[s.id] || {}).length
           return (
             <Card key={s.id} onClick={() => { setSelectedStep(s); setScreen('tasks') }} style={{ padding: '14px 18px' }}>
@@ -308,24 +310,28 @@ export function TraineeDashboard({ trainee, setScreen, setSelectedStep, setSelec
           </div>
           {notifications.length === 0 && <div style={{ fontSize: 13, color: '#bbb' }}>新しい通知はありません</div>}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {notifications.map(({ task, step, comment }) => (
-              <div key={task.id}
-                onClick={() => { setSelectedTask(task); setSelectedStep(step); setScreen('detail') }}
-                style={{ cursor: 'pointer', padding: '10px 12px', borderRadius: 8, background: '#fdf5f5', border: '1px solid rgba(145,22,25,0.1)', transition: 'background 0.12s' }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#911619', flexShrink: 0 }} />
-                  <span style={{ fontSize: 13, fontWeight: 500, color: '#911619' }}>{comment.who}</span>
-                  <span style={{ fontSize: 12, color: '#888' }}>がコメント</span>
-                  <span style={{ fontSize: 11, color: '#bbb', marginLeft: 'auto' }}>{relativeDate(comment.date)}</span>
+            {notifications.map(n => {
+              const step = steps.find(s => s.id === n.stepId)
+              const task = step?.tasks?.find(t => t.id === n.taskId)
+              return (
+                <div key={n.id}
+                  onClick={() => { if (task && step) { setSelectedTask(task); setSelectedStep(step); setScreen('detail') } }}
+                  style={{ cursor: 'pointer', padding: '10px 12px', borderRadius: 8, background: '#fdf5f5', border: '1px solid rgba(145,22,25,0.1)', transition: 'background 0.12s' }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                    <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#911619', flexShrink: 0 }} />
+                    <span style={{ fontSize: 13, fontWeight: 500, color: '#911619' }}>{n.who}</span>
+                    <span style={{ fontSize: 12, color: '#888' }}>がコメント</span>
+                    <span style={{ fontSize: 11, color: '#bbb', marginLeft: 'auto' }}>{relativeDate(n.date)}</span>
+                  </div>
+                  <div style={{ fontSize: 12, color: '#888', marginBottom: 3 }}>
+                    {step && <span style={{ fontSize: 11, fontWeight: 700, color: step.color }}>{step.label}</span>}
+                    <span style={{ marginLeft: 4 }}>{task?.title || `課題 #${n.taskId}`}</span>
+                  </div>
+                  <div style={{ fontSize: 13, color: '#888', lineHeight: 1.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{n.text}</div>
                 </div>
-                <div style={{ fontSize: 12, color: '#888', marginBottom: 3 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: step.color }}>{step.label}</span>
-                  <span style={{ marginLeft: 4 }}>{task.title}</span>
-                </div>
-                <div style={{ fontSize: 13, color: '#888', lineHeight: 1.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{comment.text}</div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </Card>
       </div>
@@ -334,10 +340,10 @@ export function TraineeDashboard({ trainee, setScreen, setSelectedStep, setSelec
 }
 
 // ── Step List (Curriculum) Screen ─────────────────────────────────────────────
-export function StepListScreen({ trainee, role, setScreen, setSelectedStep, setEditTask }) {
+export function StepListScreen({ trainee, steps, role, setScreen, setSelectedStep, setEditTask }) {
   return (
-    <div className="reveal" style={{ padding: '32px 40px', maxWidth: 860, margin: '0 auto' }}>
-      <div style={{ marginBottom: 28 }}>
+    <div className="reveal" style={{ padding: '20px 28px', maxWidth: 860, margin: '0 auto' }}>
+      <div style={{ marginBottom: 16 }}>
         <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>カリキュラム</div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.03em' }}>学習ステップ</h1>
@@ -350,10 +356,10 @@ export function StepListScreen({ trainee, role, setScreen, setSelectedStep, setE
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-        {STEPS.map((s, idx) => {
-          const p = s.tasks.length ? getProgress(trainee, s.id) : null
+        {steps.map((s, idx) => {
+          const p = s.tasks.length ? getProgress(trainee, s.id, steps) : null
           const done = Object.keys(trainee.checked[s.id] || {}).length
-          const isLast = idx === STEPS.length - 1
+          const isLast = idx === steps.length - 1
 
           return (
             <div key={s.id}>
@@ -365,7 +371,7 @@ export function StepListScreen({ trainee, role, setScreen, setSelectedStep, setE
                   background: '#ffffff', border: '1px solid rgba(0,0,0,0.08)',
                   transition: 'box-shadow 0.15s, border-color 0.15s',
                 }}
-                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.4)'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.14)' }}
+                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.04)'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.14)' }}
                 onMouseLeave={e => { e.currentTarget.style.boxShadow = ''; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.08)' }}
               >
                 {/* Step badge */}
@@ -376,7 +382,7 @@ export function StepListScreen({ trainee, role, setScreen, setSelectedStep, setE
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: 20, color: s.color,
                   }}>
-                    {s.type === 'checklist' ? '☑' : s.type === 'project' ? '🏢' : <i className={s.icon} />}
+                    {s.type === 'checklist' ? '☑' : s.type === 'project' ? <Icon name="building" size={20} /> : <i className={s.icon} />}
                   </div>
                 </div>
 
@@ -440,6 +446,8 @@ export function StepListScreen({ trainee, role, setScreen, setSelectedStep, setE
 // ── Task List ─────────────────────────────────────────────────────────────────
 export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScreen, setSelectedTask, setEditTask }) {
   const [filter, setFilter] = React.useState('all')
+  const [drawerTaskId, setDrawerTaskId] = React.useState(null)
+  const [drawerVisible, setDrawerVisible] = React.useState(false)
   const tasks = selectedStep?.tasks || []
   const checkedMap = trainee.checked[selectedStep?.id] || {}
   const isChecklist = selectedStep?.type === 'checklist'
@@ -449,6 +457,18 @@ export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScr
     if (filter === 'undone') return !(String(t.id) in checkedMap)
     return true
   })
+
+  const drawerTask = tasks.find(t => t.id === drawerTaskId) || null
+
+  function openDrawer(task) {
+    setDrawerTaskId(task.id)
+    requestAnimationFrame(() => setDrawerVisible(true))
+  }
+
+  function closeDrawer() {
+    setDrawerVisible(false)
+    setTimeout(() => setDrawerTaskId(null), 300)
+  }
 
   function toggleCheck(taskId) {
     const cur = trainee.checked[selectedStep.id] || {}
@@ -464,22 +484,22 @@ export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScr
   const pct = total ? Math.round((done / total) * 100) : 0
 
   return (
-    <div className="reveal" style={{ padding: '32px 40px', maxWidth: 860, margin: '0 auto' }}>
+    <div className="reveal" style={{ padding: '20px 40px' }}>
       {/* Breadcrumb */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, fontSize: 13, color: '#888' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, fontSize: 13, color: '#888' }}>
         <span onClick={() => setScreen('curriculum')} style={{ cursor: 'pointer', color: '#666' }}>カリキュラム</span>
         <span>›</span>
         <span style={{ color: '#1a1a1a', fontWeight: 500 }}>{selectedStep?.label}</span>
       </div>
 
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
             <span style={{ fontSize: 12, fontWeight: 800, color: selectedStep?.color }}>{selectedStep?.label}</span>
             {isChecklist && <Badge color="blue">チェックリスト</Badge>}
           </div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 10 }}>
+          <h1 style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 6 }}>
             {selectedStep?.title}
           </h1>
           {total > 0 && (
@@ -499,7 +519,7 @@ export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScr
 
       {/* Step info panel for assignment/project steps */}
       {!isChecklist && (selectedStep?.topics?.length > 0 || selectedStep?.submission) && (
-        <div style={{ marginBottom: 20, padding: '14px 18px', borderRadius: 10, background: `${selectedStep.color}0a`, border: `1px solid ${selectedStep.color}25` }}>
+        <div style={{ marginBottom: 12, padding: '10px 14px', borderRadius: 8, background: `${selectedStep.color}0a`, border: `1px solid ${selectedStep.color}25` }}>
           {selectedStep.topics.length > 0 && (
             <div style={{ marginBottom: selectedStep.submission ? 10 : 0 }}>
               <div style={{ fontSize: 11, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>学習内容</div>
@@ -527,7 +547,7 @@ export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScr
 
       {/* Filter */}
       {total > 0 && (
-        <div style={{ display: 'flex', gap: 6, marginBottom: 20 }}>
+        <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
           {['all','done','undone'].map(f => (
             <button key={f} onClick={() => setFilter(f)} style={{
               padding: '5px 12px', borderRadius: 6,
@@ -544,24 +564,27 @@ export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScr
 
       {tasks.length === 0 && (
         <div style={{ padding: '48px 24px', textAlign: 'center', color: '#bbb', border: '2px dashed rgba(0,0,0,0.1)', borderRadius: 12 }}>
-          <div style={{ fontSize: 32, marginBottom: 12 }}>🏢</div>
+          <div style={{ marginBottom: 12 }}><Icon name="building" size={32} /></div>
           <div style={{ fontSize: 14 }}>実案件ごとに課題が設定されます</div>
         </div>
       )}
 
+      {/* Task list */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         {filtered.map(task => {
           const isDone = String(task.id) in checkedMap
           const doneDate = checkedMap[String(task.id)]
+          const isActive = drawerTaskId === task.id
           return (
-            <div key={task.id} style={{
+            <div key={task.id} onClick={() => !isChecklist && openDrawer(task)} style={{
               display: 'flex', alignItems: 'center', gap: 14,
               padding: '12px 16px', borderRadius: 12,
-              background: isDone ? 'rgba(145,22,25,0.04)' : '#ffffff',
-              border: `1px solid ${isDone ? 'rgba(145,22,25,0.09)' : 'rgba(0,0,0,0.07)'}`,
+              background: isActive ? 'rgba(145,22,25,0.07)' : isDone ? 'rgba(145,22,25,0.04)' : '#ffffff',
+              border: `1px solid ${isActive ? 'rgba(145,22,25,0.25)' : isDone ? 'rgba(145,22,25,0.09)' : 'rgba(0,0,0,0.07)'}`,
               transition: 'all 0.12s',
+              cursor: isChecklist ? 'default' : 'pointer',
             }}>
-              <div onClick={() => toggleCheck(task.id)} style={{
+              <div onClick={e => { e.stopPropagation(); toggleCheck(task.id) }} style={{
                 width: 20, height: 20, borderRadius: 5, flexShrink: 0,
                 border: `2px solid ${isDone ? '#911619' : '#bbb'}`,
                 background: isDone ? '#911619' : 'transparent',
@@ -570,40 +593,140 @@ export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScr
                 fontSize: 12, color: '#fff', fontWeight: 700,
               }}>{isDone && '✓'}</div>
               <span style={{ fontSize: 12, color: '#999', width: 20, textAlign: 'right', flexShrink: 0 }}>{task.no}</span>
-              <div
-                onClick={isChecklist ? () => toggleCheck(task.id) : () => { setSelectedTask(task); setScreen('detail') }}
-                style={{ flex: 1, cursor: 'pointer' }}
-              >
-                <div style={{ color: isDone ? '#666' : '#1a1a1a', textDecoration: isDone ? 'line-through' : 'none', fontSize: 14, fontWeight: 500 }}>{task.title}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ color: isDone ? '#666' : '#1a1a1a', textDecoration: isDone ? 'line-through' : 'none', fontSize: 14, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{task.title}</div>
                 {doneDate && <div style={{ fontSize: 12, color: '#bbb', marginTop: 1 }}>達成日 {doneDate}</div>}
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                {!isChecklist && task.links?.length > 0 && <span style={{ fontSize: 11, color: '#999' }}>🔗 {task.links.length}</span>}
-                {!isChecklist && task.comments?.length > 0 && <span style={{ fontSize: 11, color: '#999' }}>💬 {task.comments.length}</span>}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                {!isChecklist && task.links?.length > 0 && <span style={{ fontSize: 11, color: '#999', display: 'flex', alignItems: 'center', gap: 3 }}><Icon name="link" size={11} /> {task.links.length}</span>}
+                {!isChecklist && task.comments?.length > 0 && <span style={{ fontSize: 11, color: '#999', display: 'flex', alignItems: 'center', gap: 3 }}><Icon name="comment" size={11} /> {task.comments.length}</span>}
               </div>
-              {!isChecklist && (
-                <div style={{ display: 'flex', gap: 4 }}>
-                  <Btn size="sm" variant="ghost" onClick={() => { setSelectedTask(task); setScreen('detail') }}>詳細</Btn>
-                  {role === 'admin' && (
-                    <Btn size="sm" variant="ghost" onClick={() => { setEditTask({ ...task, stepId: selectedStep.id, links: task.links?.length ? task.links : [''] }); setScreen('edit') }}>編集</Btn>
-                  )}
-                </div>
+              {role === 'admin' && !isChecklist && (
+                <Btn size="sm" variant="ghost" onClick={e => { e.stopPropagation(); setEditTask({ ...task, stepId: selectedStep.id, links: task.links?.length ? task.links : [''] }); setScreen('edit') }}>編集</Btn>
               )}
             </div>
           )
         })}
       </div>
+
+      {/* Drawer via Portal - rendered on body so it covers the full viewport */}
+      {drawerTaskId && createPortal(
+        <>
+          {/* Overlay - click to close */}
+          <div
+            onClick={closeDrawer}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 1000,
+              background: 'rgba(0,0,0,0.15)',
+              transition: 'opacity 0.3s',
+              opacity: drawerVisible ? 1 : 0,
+            }}
+          />
+
+          {/* Slide-in detail drawer */}
+          {drawerTask && (
+            <div style={{
+              position: 'fixed', top: 0, right: 0, bottom: 0,
+              width: '65%',
+              background: '#fff', zIndex: 1001,
+              boxShadow: '-4px 0 24px rgba(0,0,0,0.10)',
+              transform: drawerVisible ? 'translateX(0)' : 'translateX(100%)',
+              transition: 'transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1)',
+              display: 'flex', flexDirection: 'column',
+              overflow: 'hidden',
+            }}>
+              {/* Drawer header */}
+              <div style={{
+                padding: '14px 24px', borderBottom: '1px solid rgba(0,0,0,0.08)',
+                background: `${selectedStep?.color}08`, flexShrink: 0,
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {drawerTask.tag && <Badge color={drawerTask.tag === '課題' ? 'default' : 'yellow'}>{drawerTask.tag}</Badge>}
+                    <span style={{ fontSize: 12, color: '#999' }}>#{drawerTask.no}</span>
+                  </div>
+                  <button onClick={closeDrawer} style={{
+                    width: 28, height: 28, borderRadius: 6, border: '1px solid rgba(0,0,0,0.1)',
+                    background: '#fff', cursor: 'pointer', fontSize: 14, color: '#999',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>✕</button>
+                </div>
+                <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em' }}>{drawerTask.title}</div>
+              </div>
+
+              {/* Drawer body */}
+              <div style={{ flex: 1, overflow: 'auto', padding: '14px 24px' }}>
+                {/* Description */}
+                <div style={{ marginBottom: 16 }}>
+                  <div style={{ fontSize: 11, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>説明</div>
+                  {drawerTask.desc ? (
+                    <MarkdownRenderer content={drawerTask.desc} />
+                  ) : (
+                    <p style={{ fontSize: 13, color: '#ccc', margin: 0 }}>（説明なし）</p>
+                  )}
+                </div>
+
+                {/* Links */}
+                <div>
+                  <div style={{ fontSize: 11, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>参考リンク</div>
+                  {(!drawerTask.links || drawerTask.links.length === 0) ? (
+                    <div style={{ fontSize: 13, color: '#ccc' }}>リンクなし</div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {drawerTask.links.map((url, i) => (
+                        <a key={i} href={url} target="_blank" rel="noopener"
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 8,
+                            padding: '8px 10px', borderRadius: 6,
+                            background: '#f6f6f6', border: '1px solid rgba(0,0,0,0.06)',
+                            fontSize: 12, color: '#911619',
+                            textDecoration: 'none', overflow: 'hidden',
+                            transition: 'background 0.12s',
+                          }}
+                          onMouseEnter={e => e.currentTarget.style.background = '#f0eaea'}
+                          onMouseLeave={e => e.currentTarget.style.background = '#f6f6f6'}
+                        >
+                          <span style={{ flexShrink: 0, fontSize: 11, color: '#999' }}>0{i + 1}</span>
+                          <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{url}</span>
+                          <span style={{ flexShrink: 0, fontSize: 11, color: '#999' }}>↗</span>
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Drawer footer */}
+              <div style={{
+                padding: '12px 24px', borderTop: '1px solid rgba(0,0,0,0.06)',
+                background: '#fafafa', flexShrink: 0,
+                display: 'flex', gap: 8, width: '100%', boxSizing: 'border-box',
+              }}>
+                <Btn variant="primary" size="sm" onClick={() => { setSelectedTask(drawerTask); setScreen('detail') }}>詳細ページを開く</Btn>
+                {role === 'admin' && (
+                  <Btn size="sm" onClick={() => { setEditTask({ ...drawerTask, stepId: selectedStep.id, links: drawerTask.links?.length ? drawerTask.links : [''] }); setScreen('edit') }}>編集</Btn>
+                )}
+              </div>
+            </div>
+          )}
+        </>,
+        document.body
+      )}
     </div>
   )
 }
 
 // ── Task Detail ───────────────────────────────────────────────────────────────
-export function TaskDetailScreen({ task, trainee, setTrainee, selectedStep, role, setScreen, setEditTask }) {
+export function TaskDetailScreen({ task, trainee, setTrainee, selectedStep, role, setScreen, setEditTask, comments, onAddComment, currentUser }) {
   const [newComment, setNewComment] = React.useState('')
-  const [localTask, setLocalTask] = React.useState(task)
+  const [localComments, setLocalComments] = React.useState(comments || [])
+  const [submitting, setSubmitting] = React.useState(false)
   const checkedMap = trainee.checked[selectedStep?.id] || {}
   const checked = String(task.id) in checkedMap
   const doneDate = checkedMap[String(task.id)]
+
+  // Sync when comments prop changes (new task loaded)
+  React.useEffect(() => { setLocalComments(comments || []) }, [comments])
 
   function toggleCheck() {
     const cur = trainee.checked[selectedStep.id] || {}
@@ -614,15 +737,22 @@ export function TaskDetailScreen({ task, trainee, setTrainee, selectedStep, role
     setTrainee({ ...trainee, checked: { ...trainee.checked, [selectedStep.id]: next } })
   }
 
-  function submitComment() {
-    if (!newComment.trim()) return
-    const comment = { who: role === 'admin' ? '田中 先輩' : trainee.name, role, date: TODAY, text: newComment.trim() }
-    setLocalTask({ ...localTask, comments: [...(localTask.comments || []), comment] })
-    setNewComment('')
+  async function submitComment() {
+    if (!newComment.trim() || !onAddComment || submitting) return
+    setSubmitting(true)
+    try {
+      const comment = await onAddComment(newComment.trim())
+      if (comment) setLocalComments(c => [...c, comment])
+      setNewComment('')
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
-    <div className="reveal" style={{ padding: '32px 40px', maxWidth: 780, margin: '0 auto' }}>
+    <div className="reveal" style={{ padding: '20px 28px', maxWidth: 780, margin: '0 auto' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, fontSize: 13, color: '#888' }}>
         <span onClick={() => setScreen('curriculum')} style={{ cursor: 'pointer', color: '#666' }}>カリキュラム</span>
         <span>›</span>
@@ -631,7 +761,7 @@ export function TaskDetailScreen({ task, trainee, setTrainee, selectedStep, role
         <span style={{ color: '#1a1a1a' }}>課題 {task.no}</span>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginBottom: 28 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginBottom: 16 }}>
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', gap: 8, marginBottom: 10, alignItems: 'center' }}>
             <Badge>{selectedStep?.label}</Badge>
@@ -642,7 +772,7 @@ export function TaskDetailScreen({ task, trainee, setTrainee, selectedStep, role
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
           {role === 'admin' && (
-            <Btn size="sm" onClick={() => { setEditTask({ ...task, stepId: selectedStep.id, links: task.links?.length ? task.links : [''] }); setScreen('edit') }}>✏️ 編集</Btn>
+            <Btn size="sm" onClick={() => { setEditTask({ ...task, stepId: selectedStep.id, links: task.links?.length ? task.links : [''] }); setScreen('edit') }}><Icon name="pencil" size={12} /> 編集</Btn>
           )}
           <div onClick={toggleCheck} style={{
             display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer',
@@ -668,14 +798,14 @@ export function TaskDetailScreen({ task, trainee, setTrainee, selectedStep, role
 
       <Card style={{ marginBottom: 14 }}>
         <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>説明</div>
-        <p style={{ color: '#bbb', lineHeight: 1.8, fontSize: 15 }}>{localTask.desc || '（説明なし）'}</p>
+        {task.desc ? <MarkdownRenderer content={task.desc} /> : <p style={{ color: '#bbb', fontSize: 15 }}>（説明なし）</p>}
       </Card>
 
-      {localTask.links?.length > 0 && (
+      {task.links?.length > 0 && (
         <Card style={{ marginBottom: 14 }}>
           <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>参考リンク</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {localTask.links.map((url, i) => (
+            {task.links.map((url, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: '#f0f0f0', borderRadius: 6, border: '1px solid rgba(0,0,0,0.07)' }}>
                 <span style={{ fontSize: 12, color: '#999' }}>0{i+1}</span>
                 <a href={url} target="_blank" rel="noopener" style={{ fontSize: 14, color: '#911619', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{url}</a>
@@ -687,10 +817,10 @@ export function TaskDetailScreen({ task, trainee, setTrainee, selectedStep, role
       )}
 
       <Card>
-        <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14 }}>コメント（{(localTask.comments || []).length}）</div>
-        {(!localTask.comments || localTask.comments.length === 0) && <div style={{ color: '#999', fontSize: 14, marginBottom: 16 }}>コメントはまだありません</div>}
-        {(localTask.comments || []).map((c, i) => (
-          <div key={i} style={{ marginBottom: 12, padding: '12px 14px', background: '#f0f0f0', borderRadius: 12, border: '1px solid rgba(0,0,0,0.07)' }}>
+        <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14 }}>コメント（{localComments.length}）</div>
+        {localComments.length === 0 && <div style={{ color: '#999', fontSize: 14, marginBottom: 16 }}>コメントはまだありません</div>}
+        {localComments.map((c, i) => (
+          <div key={c.id || i} style={{ marginBottom: 12, padding: '12px 14px', background: '#f0f0f0', borderRadius: 12, border: '1px solid rgba(0,0,0,0.07)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
               <Avatar name={c.who} size={22} />
               <span style={{ fontSize: 13, fontWeight: 500 }}>{c.who}</span>
@@ -702,21 +832,35 @@ export function TaskDetailScreen({ task, trainee, setTrainee, selectedStep, role
         ))}
         <Divider style={{ margin: '14px 0' }} />
         <Textarea value={newComment} onChange={setNewComment} placeholder="コメントを入力..." rows={3} style={{ marginBottom: 8 }} />
-        <Btn variant="primary" size="sm" onClick={submitComment} disabled={!newComment.trim()}>送信</Btn>
+        <Btn variant="primary" size="sm" onClick={submitComment} disabled={!newComment.trim() || submitting}>
+          {submitting ? '送信中...' : '送信'}
+        </Btn>
       </Card>
     </div>
   )
 }
 
 // ── Task Edit ─────────────────────────────────────────────────────────────────
-export function TaskEditScreen({ editTask, setScreen }) {
+export function TaskEditScreen({ editTask, steps, setScreen, onSave }) {
   const isNew = !editTask.id
   const [form, setForm] = React.useState(editTask)
+  const [saving, setSaving] = React.useState(false)
   const f = (k, v) => setForm(p => ({ ...p, [k]: v }))
 
+  async function handleSave() {
+    if (!form.title.trim() || saving) return
+    setSaving(true)
+    try {
+      await onSave(form)
+    } catch (e) {
+      console.error('保存エラー:', e)
+      setSaving(false)
+    }
+  }
+
   return (
-    <div className="reveal" style={{ padding: '32px 40px', maxWidth: 720, margin: '0 auto' }}>
-      <div style={{ marginBottom: 28 }}>
+    <div className="reveal" style={{ padding: '20px 28px' }}>
+      <div style={{ marginBottom: 16 }}>
         <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>管理者専用</div>
         <h1 style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.02em' }}>{isNew ? '課題を追加' : '課題を編集'}</h1>
       </div>
@@ -725,7 +869,7 @@ export function TaskEditScreen({ editTask, setScreen }) {
         <div style={{ display: 'flex', gap: 12 }}>
           <div style={{ flex: 2 }}>
             <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>ステップ</div>
-            <Select value={form.stepId} onChange={v => f('stepId', v)} options={STEPS.map(s => ({ value: s.id, label: `${s.label}: ${s.title}` }))} />
+            <Select value={form.stepId} onChange={v => f('stepId', v)} options={steps.map(s => ({ value: s.id, label: `${s.label}: ${s.title}` }))} />
           </div>
           <div style={{ width: 80 }}>
             <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>番号</div>
@@ -738,7 +882,7 @@ export function TaskEditScreen({ editTask, setScreen }) {
         </div>
         <div>
           <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>説明文</div>
-          <Textarea value={form.desc} onChange={v => f('desc', v)} placeholder="課題の詳細説明を入力..." rows={4} />
+          <MarkdownEditor value={form.desc} onChange={v => f('desc', v)} rows={12} />
         </div>
         <div>
           <div style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>参考リンク</div>
@@ -755,7 +899,7 @@ export function TaskEditScreen({ editTask, setScreen }) {
         <Divider />
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
           <Btn onClick={() => setScreen('tasks')}>キャンセル</Btn>
-          <Btn variant="primary" disabled={!form.title.trim()}>💾 {isNew ? '追加する' : '保存する'}</Btn>
+          <Btn variant="primary" disabled={!form.title.trim() || saving} onClick={handleSave}>{saving ? '保存中...' : <><Icon name="save" size={13} /> {isNew ? '追加する' : '保存する'}</>}</Btn>
         </div>
       </Card>
     </div>
@@ -763,13 +907,13 @@ export function TaskEditScreen({ editTask, setScreen }) {
 }
 
 // ── Trainee Management ────────────────────────────────────────────────────────
-export function TraineeManagementScreen({ trainees, setScreen, setSelectedTrainee }) {
+export function TraineeManagementScreen({ trainees, steps, setScreen, setSelectedTrainee }) {
   const [expanded, setExpanded] = React.useState(trainees[0]?.id)
   const [newName, setNewName] = React.useState('')
 
   return (
-    <div className="reveal" style={{ padding: '32px 40px', maxWidth: 860, margin: '0 auto' }}>
-      <div style={{ marginBottom: 28 }}>
+    <div className="reveal" style={{ padding: '20px 28px', maxWidth: 860, margin: '0 auto' }}>
+      <div style={{ marginBottom: 16 }}>
         <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>管理者専用</div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.03em' }}>新人管理</h1>
@@ -801,8 +945,8 @@ export function TraineeManagementScreen({ trainees, setScreen, setSelectedTraine
                 <div style={{ padding: '0 18px 18px', borderTop: '1px solid rgba(0,0,0,0.07)' }}>
                   <div style={{ marginTop: 14, marginBottom: 10, fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em' }}>ステップ別進捗</div>
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                    {STEPS.map(s => {
-                      const p = s.tasks.length ? getProgress(t, s.id) : null
+                    {steps.map(s => {
+                      const p = s.tasks.length ? getProgress(t, s.id, steps) : null
                       return (
                         <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 6, background: '#f0f0f0', border: '1px solid rgba(0,0,0,0.07)' }}>
                           <span style={{ fontSize: 11, fontWeight: 700, color: s.color }}>{s.label}</span>
@@ -846,17 +990,17 @@ export function TraineeManagementScreen({ trainees, setScreen, setSelectedTraine
 }
 
 // ── Trainee Detail View ───────────────────────────────────────────────────────
-export function TraineeDetailView({ trainee, setScreen, setSelectedStep }) {
-  const overall = getOverallProgress(trainee)
-  const totalTasks = STEPS.reduce((a, s) => a + s.tasks.length, 0)
+export function TraineeDetailView({ trainee, steps, setScreen, setSelectedStep }) {
+  const overall = getOverallProgress(trainee, steps)
+  const totalTasks = steps.reduce((a, s) => a + s.tasks.length, 0)
   return (
-    <div className="reveal" style={{ padding: '32px 40px', maxWidth: 800, margin: '0 auto' }}>
+    <div className="reveal" style={{ padding: '20px 28px', maxWidth: 800, margin: '0 auto' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, fontSize: 13, color: '#888' }}>
         <span onClick={() => setScreen('dashboard')} style={{ cursor: 'pointer', color: '#666' }}>ダッシュボード</span>
         <span>›</span>
         <span style={{ color: '#1a1a1a' }}>{trainee.name}</span>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
         <Avatar name={trainee.name} size={48} />
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.02em' }}>{trainee.name}</h1>
@@ -875,8 +1019,8 @@ export function TraineeDetailView({ trainee, setScreen, setSelectedStep }) {
       </Card>
       <SectionTitle>ステップごとの完了率</SectionTitle>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {STEPS.map(s => {
-          const p = s.tasks.length ? getProgress(trainee, s.id) : null
+        {steps.map(s => {
+          const p = s.tasks.length ? getProgress(trainee, s.id, steps) : null
           const done = Object.keys(trainee.checked[s.id] || {}).length
           return (
             <Card key={s.id} onClick={() => { setSelectedStep(s); setScreen('tasks') }} style={{ padding: '14px 18px' }}>
