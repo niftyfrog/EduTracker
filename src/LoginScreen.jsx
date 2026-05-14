@@ -3,7 +3,7 @@ import { supabase } from './lib/supabase'
 
 export function LoginScreen() {
   const [mode, setMode] = React.useState('login') // 'login' | 'signup'
-  const [email, setEmail] = React.useState('')
+  const [userId, setUserId] = React.useState('')
   const [password, setPassword] = React.useState('')
   const [name, setName] = React.useState('')
   const [loading, setLoading] = React.useState(false)
@@ -14,6 +14,7 @@ export function LoginScreen() {
     e.preventDefault()
     setLoading(true)
     setError('')
+    const email = `${userId.trim().toLowerCase()}@edutracker.local`
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) setError(error.message)
     setLoading(false)
@@ -24,6 +25,7 @@ export function LoginScreen() {
     if (!name.trim()) { setError('名前を入力してください'); return }
     setLoading(true)
     setError('')
+    const email = `${userId.trim().toLowerCase()}@edutracker.local`
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -32,7 +34,8 @@ export function LoginScreen() {
     if (error) {
       setError(error.message)
     } else {
-      setMessage('確認メールを送信しました。メールのリンクをクリックしてログインしてください。')
+      setMessage('アカウントを作成しました。ログインしてください。')
+      setMode('login')
     }
     setLoading(false)
   }
@@ -95,13 +98,14 @@ export function LoginScreen() {
               )}
 
               <div>
-                <label style={{ display: 'block', fontSize: 12, color: '#666', fontWeight: 500, marginBottom: 5 }}>メールアドレス</label>
+                <label style={{ display: 'block', fontSize: 12, color: '#666', fontWeight: 500, marginBottom: 5 }}>ユーザーID</label>
                 <input
-                  type="email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  placeholder="example@company.com"
+                  type="text"
+                  value={userId}
+                  onChange={e => setUserId(e.target.value)}
+                  placeholder="yamada_hanako"
                   required
+                  autoComplete="username"
                   style={inputStyle}
                 />
               </div>

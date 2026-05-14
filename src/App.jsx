@@ -152,6 +152,8 @@ export default function App() {
       tag: form.tag,
       desc: form.desc,
       links: form.links,
+      criteria: form.criteria,
+      criteriaImage: form.criteriaImage,
       userId: session.user.id,
     })
     // Reload task edits and merge

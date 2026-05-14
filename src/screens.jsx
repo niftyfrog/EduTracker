@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { getProgress, getOverallProgress, getCompletionDates, getRecentCompletions, relativeDate, getTotalDone, TODAY } from './data'
 import { MarkdownRenderer, MarkdownEditor } from './Markdown'
 import { N, ProgressBar, Badge, Card, Btn, Input, Select, Textarea, Avatar, SectionTitle, Divider, StatCard, Icon } from './components'
+import { uploadTaskImage } from './lib/db'
 
 // ── Sidebar ──────────────────────────────────────────────────────────────────
 export function Sidebar({ screen, setScreen, role, user }) {
@@ -348,7 +349,7 @@ export function StepListScreen({ trainee, steps, role, setScreen, setSelectedSte
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.03em' }}>学習ステップ</h1>
           {role === 'admin' && (
-            <Btn variant="primary" size="sm" onClick={() => { setEditTask({ id: null, stepId: 'step1', no: '', title: '', tag: '課題', desc: '', links: [''] }); setScreen('edit') }}>
+            <Btn variant="primary" size="sm" onClick={() => { setEditTask({ id: null, stepId: 'step1', no: '', title: '', tag: '課題', desc: '', links: [''], criteria: '', criteriaImage: '' }); setScreen('edit') }}>
               ＋ 課題を追加
             </Btn>
           )}
@@ -511,7 +512,7 @@ export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScr
           )}
         </div>
         {role === 'admin' && (
-          <Btn variant="primary" size="sm" onClick={() => { setEditTask({ id: null, stepId: selectedStep.id, no: tasks.length + 1, title: '', tag: '課題', desc: '', links: [''] }); setScreen('edit') }}>
+          <Btn variant="primary" size="sm" onClick={() => { setEditTask({ id: null, stepId: selectedStep.id, no: tasks.length + 1, title: '', tag: '課題', desc: '', links: [''], criteria: '', criteriaImage: '' }); setScreen('edit') }}>
             ＋ 課題追加
           </Btn>
         )}
@@ -576,13 +577,13 @@ export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScr
           const doneDate = checkedMap[String(task.id)]
           const isActive = drawerTaskId === task.id
           return (
-            <div key={task.id} onClick={() => !isChecklist && openDrawer(task)} style={{
+            <div key={task.id} onClick={() => openDrawer(task)} style={{
               display: 'flex', alignItems: 'center', gap: 14,
               padding: '12px 16px', borderRadius: 12,
               background: isActive ? 'rgba(145,22,25,0.07)' : isDone ? 'rgba(145,22,25,0.04)' : '#ffffff',
               border: `1px solid ${isActive ? 'rgba(145,22,25,0.25)' : isDone ? 'rgba(145,22,25,0.09)' : 'rgba(0,0,0,0.07)'}`,
               transition: 'all 0.12s',
-              cursor: isChecklist ? 'default' : 'pointer',
+              cursor: 'pointer',
             }}>
               <div onClick={e => { e.stopPropagation(); toggleCheck(task.id) }} style={{
                 width: 20, height: 20, borderRadius: 5, flexShrink: 0,
@@ -598,11 +599,11 @@ export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScr
                 {doneDate && <div style={{ fontSize: 12, color: '#bbb', marginTop: 1 }}>達成日 {doneDate}</div>}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                {!isChecklist && task.links?.length > 0 && <span style={{ fontSize: 11, color: '#999', display: 'flex', alignItems: 'center', gap: 3 }}><Icon name="link" size={11} /> {task.links.length}</span>}
-                {!isChecklist && task.comments?.length > 0 && <span style={{ fontSize: 11, color: '#999', display: 'flex', alignItems: 'center', gap: 3 }}><Icon name="comment" size={11} /> {task.comments.length}</span>}
+                {task.links?.length > 0 && <span style={{ fontSize: 11, color: '#999', display: 'flex', alignItems: 'center', gap: 3 }}><Icon name="link" size={11} /> {task.links.length}</span>}
+                {task.comments?.length > 0 && <span style={{ fontSize: 11, color: '#999', display: 'flex', alignItems: 'center', gap: 3 }}><Icon name="comment" size={11} /> {task.comments.length}</span>}
               </div>
-              {role === 'admin' && !isChecklist && (
-                <Btn size="sm" variant="ghost" onClick={e => { e.stopPropagation(); setEditTask({ ...task, stepId: selectedStep.id, links: task.links?.length ? task.links : [''] }); setScreen('edit') }}>編集</Btn>
+              {role === 'admin' && (
+                <Btn size="sm" variant="ghost" onClick={e => { e.stopPropagation(); setEditTask({ ...task, stepId: selectedStep.id, links: task.links?.length ? task.links : [''], criteria: task.criteria || '', criteriaImage: task.criteriaImage || '' }); setScreen('edit') }}>編集</Btn>
               )}
             </div>
           )
@@ -666,6 +667,23 @@ export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScr
                   )}
                 </div>
 
+                {/* Criteria */}
+                {(drawerTask.criteria || drawerTask.criteriaImage) && (
+                  <div style={{ marginBottom: 16 }}>
+                    <div style={{ fontSize: 11, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>完了条件</div>
+                    {drawerTask.criteria && (
+                      <div style={{ fontSize: 13, color: '#1a1a1a', lineHeight: 1.7, marginBottom: drawerTask.criteriaImage ? 10 : 0 }}>
+                        <MarkdownRenderer content={drawerTask.criteria} />
+                      </div>
+                    )}
+                    {drawerTask.criteriaImage && (
+                      <div style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.08)' }}>
+                        <img src={drawerTask.criteriaImage} alt="完了条件の参考画像" style={{ width: '100%', display: 'block' }} />
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Links */}
                 <div>
                   <div style={{ fontSize: 11, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>参考リンク</div>
@@ -700,12 +718,12 @@ export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScr
               <div style={{
                 padding: '12px 24px', borderTop: '1px solid rgba(0,0,0,0.06)',
                 background: '#fafafa', flexShrink: 0,
-                display: 'flex', gap: 8, width: '100%', boxSizing: 'border-box',
+                display: 'flex', gap: 8, width: '100%', boxSizing: 'border-box', justifyContent: 'flex-end',
               }}>
-                <Btn variant="primary" size="sm" onClick={() => { setSelectedTask(drawerTask); setScreen('detail') }}>詳細ページを開く</Btn>
                 {role === 'admin' && (
-                  <Btn size="sm" onClick={() => { setEditTask({ ...drawerTask, stepId: selectedStep.id, links: drawerTask.links?.length ? drawerTask.links : [''] }); setScreen('edit') }}>編集</Btn>
+                  <Btn size="sm" onClick={() => { setEditTask({ ...drawerTask, stepId: selectedStep.id, links: drawerTask.links?.length ? drawerTask.links : [''], criteria: drawerTask.criteria || '', criteriaImage: drawerTask.criteriaImage || '' }); setScreen('edit') }}>編集</Btn>
                 )}
+                <Btn variant="primary" size="sm" onClick={() => { setSelectedTask(drawerTask); setScreen('detail') }}>詳細ページを開く</Btn>
               </div>
             </div>
           )}
@@ -772,7 +790,7 @@ export function TaskDetailScreen({ task, trainee, setTrainee, selectedStep, role
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
           {role === 'admin' && (
-            <Btn size="sm" onClick={() => { setEditTask({ ...task, stepId: selectedStep.id, links: task.links?.length ? task.links : [''] }); setScreen('edit') }}><Icon name="pencil" size={12} /> 編集</Btn>
+            <Btn size="sm" onClick={() => { setEditTask({ ...task, stepId: selectedStep.id, links: task.links?.length ? task.links : [''], criteria: task.criteria || '', criteriaImage: task.criteriaImage || '' }); setScreen('edit') }}><Icon name="pencil" size={12} /> 編集</Btn>
           )}
           <div onClick={toggleCheck} style={{
             display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer',
@@ -800,6 +818,18 @@ export function TaskDetailScreen({ task, trainee, setTrainee, selectedStep, role
         <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>説明</div>
         {task.desc ? <MarkdownRenderer content={task.desc} /> : <p style={{ color: '#bbb', fontSize: 15 }}>（説明なし）</p>}
       </Card>
+
+      {(task.criteria || task.criteriaImage) && (
+        <Card style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>完了条件</div>
+          {task.criteria && <MarkdownRenderer content={task.criteria} />}
+          {task.criteriaImage && (
+            <div style={{ marginTop: task.criteria ? 10 : 0, borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.08)' }}>
+              <img src={task.criteriaImage} alt="完了条件の参考画像" style={{ width: '100%', display: 'block' }} />
+            </div>
+          )}
+        </Card>
+      )}
 
       {task.links?.length > 0 && (
         <Card style={{ marginBottom: 14 }}>
@@ -845,7 +875,21 @@ export function TaskEditScreen({ editTask, steps, setScreen, onSave }) {
   const isNew = !editTask.id
   const [form, setForm] = React.useState(editTask)
   const [saving, setSaving] = React.useState(false)
+  const [uploading, setUploading] = React.useState(false)
   const f = (k, v) => setForm(p => ({ ...p, [k]: v }))
+
+  async function handleImageUpload(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    try {
+      const url = await uploadTaskImage(file)
+      f('criteriaImage', url)
+    } catch (err) {
+      console.error('画像アップロードエラー:', err)
+    }
+    setUploading(false)
+  }
 
   async function handleSave() {
     if (!form.title.trim() || saving) return
@@ -894,6 +938,34 @@ export function TaskEditScreen({ editTask, steps, setScreen, onSave }) {
               </div>
             ))}
             <Btn size="sm" variant="ghost" onClick={() => f('links', [...form.links, ''])} style={{ alignSelf: 'flex-start' }}>＋ リンクを追加</Btn>
+          </div>
+        </div>
+        <div>
+          <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>完了条件</div>
+          <MarkdownEditor value={form.criteria || ''} onChange={v => f('criteria', v)} rows={4} placeholder="例: コンソール画面にHelloWorldが表示されている" />
+        </div>
+        <div>
+          <div style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>完了条件の参考画像</div>
+          {form.criteriaImage && (
+            <div style={{ marginBottom: 8, position: 'relative', display: 'inline-block' }}>
+              <img src={form.criteriaImage} alt="完了条件" style={{ maxWidth: '100%', maxHeight: 200, borderRadius: 8, border: '1px solid rgba(0,0,0,0.08)' }} />
+              <button onClick={() => f('criteriaImage', '')} style={{
+                position: 'absolute', top: 4, right: 4, width: 22, height: 22, borderRadius: 6,
+                background: 'rgba(0,0,0,0.6)', color: '#fff', border: 'none', cursor: 'pointer',
+                fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>✕</button>
+            </div>
+          )}
+          <div>
+            <label style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px',
+              borderRadius: 6, border: '1px solid rgba(0,0,0,0.12)', background: '#fafafa',
+              fontSize: 13, color: '#666', cursor: uploading ? 'not-allowed' : 'pointer',
+            }}>
+              <Icon name="image" size={14} />
+              {uploading ? 'アップロード中...' : '画像を選択'}
+              <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} style={{ display: 'none' }} />
+            </label>
           </div>
         </div>
         <Divider />

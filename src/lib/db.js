@@ -134,17 +134,36 @@ export async function fetchTaskEdits() {
   return data || []
 }
 
-export async function upsertTaskEdit({ stepId, taskId, title, tag, desc, links, userId }) {
-  const { data, error } = await supabase
+export async function upsertTaskEdit({ stepId, taskId, title, tag, desc, links, criteria, criteriaImage, userId }) {
+  const row = { step_id: stepId, task_id: taskId, title, tag, description: desc, links: links?.filter(u => u.trim()) || [], criteria: criteria || null, criteria_image: criteriaImage || null, updated_by: userId }
+  let { data, error } = await supabase
     .from('task_edits')
-    .upsert(
-      { step_id: stepId, task_id: taskId, title, tag, description: desc, links: links?.filter(u => u.trim()) || [], updated_by: userId },
-      { onConflict: 'step_id,task_id' }
-    )
+    .upsert(row, { onConflict: 'step_id,task_id' })
     .select()
     .single()
+  // criteriaカラム未追加の場合、カラムなしでリトライ
+  if (error) {
+    delete row.criteria
+    delete row.criteria_image
+    const res = await supabase
+      .from('task_edits')
+      .upsert(row, { onConflict: 'step_id,task_id' })
+      .select()
+      .single()
+    data = res.data
+    error = res.error
+  }
   if (error) throw error
   return data
+}
+
+export async function uploadTaskImage(file) {
+  const ext = file.name.split('.').pop()
+  const path = `criteria/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`
+  const { error } = await supabase.storage.from('task-images').upload(path, file)
+  if (error) throw error
+  const { data } = supabase.storage.from('task-images').getPublicUrl(path)
+  return data.publicUrl
 }
 
 export async function deleteTaskEdit(stepId, taskId) {
@@ -171,6 +190,8 @@ export function mergeTaskEdits(steps, edits) {
         tag: edit.tag || task.tag,
         desc: edit.description || task.desc,
         links: edit.links || task.links,
+        criteria: edit.criteria || task.criteria || null,
+        criteriaImage: edit.criteria_image || task.criteriaImage || null,
       }
     })
 
