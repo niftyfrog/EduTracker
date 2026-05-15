@@ -60,50 +60,52 @@ const markdownStyles = {
   img: { maxWidth: '100%', borderRadius: 6 },
 }
 
-export function MarkdownRenderer({ content }) {
+// Stable components object — avoids re-parse on every render
+const mdComponents = {
+  h1: ({ children }) => <h1 style={markdownStyles.h1}>{children}</h1>,
+  h2: ({ children }) => <h2 style={markdownStyles.h2}>{children}</h2>,
+  h3: ({ children }) => <h3 style={markdownStyles.h3}>{children}</h3>,
+  h4: ({ children }) => <h4 style={markdownStyles.h4}>{children}</h4>,
+  p: ({ children }) => <p style={markdownStyles.p}>{children}</p>,
+  ul: ({ children }) => <ul style={markdownStyles.ul}>{children}</ul>,
+  ol: ({ children }) => <ol style={markdownStyles.ol}>{children}</ol>,
+  li: ({ children }) => <li style={markdownStyles.li}>{children}</li>,
+  blockquote: ({ children }) => <blockquote style={markdownStyles.blockquote}>{children}</blockquote>,
+  table: ({ children }) => <table style={markdownStyles.table}>{children}</table>,
+  th: ({ children }) => <th style={markdownStyles.th}>{children}</th>,
+  td: ({ children }) => <td style={markdownStyles.td}>{children}</td>,
+  a: ({ href, children }) => <a href={href} target="_blank" rel="noopener noreferrer" style={markdownStyles.a}>{children}</a>,
+  hr: () => <hr style={markdownStyles.hr} />,
+  img: ({ src, alt }) => <img src={src} alt={alt} style={markdownStyles.img} />,
+  code: ({ inline, className, children }) => {
+    if (inline) {
+      return <code style={markdownStyles.inlineCode}>{children}</code>
+    }
+    const lang = className?.replace('language-', '') || ''
+    const codeStr = String(children).replace(/\n$/, '')
+    return (
+      <React.Suspense fallback={<pre style={codeTheme['pre[class*="language-"]']}><code>{codeStr}</code></pre>}>
+        <SyntaxHighlighter language={lang} style={codeTheme} PreTag="div">
+          {codeStr}
+        </SyntaxHighlighter>
+      </React.Suspense>
+    )
+  },
+}
+
+const remarkPlugins = [remarkGfm]
+
+export const MarkdownRenderer = React.memo(function MarkdownRenderer({ content }) {
   if (!content) return null
 
   return (
     <div style={markdownStyles.wrapper}>
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        components={{
-          h1: ({ children }) => <h1 style={markdownStyles.h1}>{children}</h1>,
-          h2: ({ children }) => <h2 style={markdownStyles.h2}>{children}</h2>,
-          h3: ({ children }) => <h3 style={markdownStyles.h3}>{children}</h3>,
-          h4: ({ children }) => <h4 style={markdownStyles.h4}>{children}</h4>,
-          p: ({ children }) => <p style={markdownStyles.p}>{children}</p>,
-          ul: ({ children }) => <ul style={markdownStyles.ul}>{children}</ul>,
-          ol: ({ children }) => <ol style={markdownStyles.ol}>{children}</ol>,
-          li: ({ children }) => <li style={markdownStyles.li}>{children}</li>,
-          blockquote: ({ children }) => <blockquote style={markdownStyles.blockquote}>{children}</blockquote>,
-          table: ({ children }) => <table style={markdownStyles.table}>{children}</table>,
-          th: ({ children }) => <th style={markdownStyles.th}>{children}</th>,
-          td: ({ children }) => <td style={markdownStyles.td}>{children}</td>,
-          a: ({ href, children }) => <a href={href} target="_blank" rel="noopener noreferrer" style={markdownStyles.a}>{children}</a>,
-          hr: () => <hr style={markdownStyles.hr} />,
-          img: ({ src, alt }) => <img src={src} alt={alt} style={markdownStyles.img} />,
-          code: ({ inline, className, children }) => {
-            if (inline) {
-              return <code style={markdownStyles.inlineCode}>{children}</code>
-            }
-            const lang = className?.replace('language-', '') || ''
-            const codeStr = String(children).replace(/\n$/, '')
-            return (
-              <React.Suspense fallback={<pre style={codeTheme['pre[class*="language-"]']}><code>{codeStr}</code></pre>}>
-                <SyntaxHighlighter language={lang} style={codeTheme} PreTag="div">
-                  {codeStr}
-                </SyntaxHighlighter>
-              </React.Suspense>
-            )
-          },
-        }}
-      >
+      <ReactMarkdown remarkPlugins={remarkPlugins} components={mdComponents}>
         {content}
       </ReactMarkdown>
     </div>
   )
-}
+})
 
 const cheatSheetSections = [
   { title: '見出し', items: ['# 見出し1', '## 見出し2', '### 見出し3'] },

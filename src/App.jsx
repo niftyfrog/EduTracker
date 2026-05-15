@@ -1,7 +1,7 @@
 import React from 'react'
 import { STEPS, TODAY } from './data'
 import { Avatar } from './components'
-import { Sidebar, AdminDashboard, TraineeDashboard, StepListScreen, TaskListScreen, TaskDetailScreen, TaskEditScreen, TraineeManagementScreen, TraineeDetailView } from './screens'
+import { Sidebar, AdminDashboard, TraineeDashboard, StepListScreen, TaskListScreen, TaskDetailScreen, LearningScreen, TaskEditScreen, TraineeManagementScreen, TraineeDetailView } from './screens'
 import { FAMapScreen } from './famap'
 import { AIGenerateScreen } from './aigenerate'
 import { LoginScreen } from './LoginScreen'
@@ -221,6 +221,19 @@ export default function App() {
         return <AIGenerateScreen role={role} userId={session.user.id} />
       case 'tasks':
         return <TaskListScreen trainee={traineeForTasks} setTrainee={setTraineeForTasks} selectedStep={liveSelectedStep} role={role} setScreen={setScreen} setSelectedTask={setSelectedTask} setEditTask={setEditTask} />
+      case 'learn':
+        return selectedTask
+          ? <LearningScreen
+              task={selectedTask}
+              trainee={traineeForTasks}
+              setTrainee={setTraineeForTasks}
+              selectedStep={liveSelectedStep}
+              role={role}
+              setScreen={setScreen}
+              setEditTask={setEditTask}
+              setSelectedTask={setSelectedTask}
+            />
+          : <div style={{ padding: 40, color: '#888' }}>課題が選択されていません</div>
       case 'detail':
         return selectedTask
           ? <TaskDetailScreen

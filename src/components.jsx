@@ -200,7 +200,7 @@ export function Avatar({ name, size = 32 }) {
 export function SectionTitle({ children, action }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-      <h2 style={{ fontSize: 11, fontWeight: 600, color: N.muted2, textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>{children}</h2>
+      <h2 style={{ fontSize: 12, fontWeight: 600, color: N.muted2, textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>{children}</h2>
       {action}
     </div>
   )
@@ -213,7 +213,7 @@ export function Divider({ style = {} }) {
 export function StatCard({ label, value, suffix = '', color = N.text }) {
   return (
     <Card style={{ flex: 1 }}>
-      <div style={{ fontSize: 11, color: N.muted2, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>{label}</div>
+      <div style={{ fontSize: 12, color: N.muted2, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>{label}</div>
       <div style={{ fontSize: 28, fontWeight: 700, color, fontVariantNumeric: 'tabular-nums' }}>
         {value}<span style={{ fontSize: 14, fontWeight: 400, color: N.muted, marginLeft: 2 }}>{suffix}</span>
       </div>

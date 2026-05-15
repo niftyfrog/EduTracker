@@ -41,7 +41,7 @@ export function Sidebar({ screen, setScreen, role, user }) {
       </div>
 
       <nav style={{ flex: 1, padding: '10px 8px', overflow: 'auto' }}>
-        <div style={{ fontSize: 10, color: '#bbb', textTransform: 'uppercase', letterSpacing: '0.12em', padding: '0 10px', marginBottom: 8, marginTop: 4 }}>
+        <div style={{ fontSize: 11, color: '#bbb', textTransform: 'uppercase', letterSpacing: '0.12em', padding: '0 10px', marginBottom: 8, marginTop: 4 }}>
           {role === 'admin' ? '管理メニュー' : 'メニュー'}
         </div>
         {nav.map(item => {
@@ -49,11 +49,11 @@ export function Sidebar({ screen, setScreen, role, user }) {
           return (
             <div key={item.id} onClick={() => setScreen(item.id)} style={{
               display: 'flex', alignItems: 'center', gap: 10,
-              padding: '8px 10px', borderRadius: 6, marginBottom: 1,
+              padding: '9px 12px', borderRadius: 6, marginBottom: 2,
               cursor: 'pointer', transition: 'all 0.12s',
               background: active ? 'rgba(145,22,25,0.1)' : 'transparent',
               color: active ? '#911619' : '#777',
-              fontSize: 13.5, fontWeight: active ? 600 : 400,
+              fontSize: 14, fontWeight: active ? 600 : 400,
             }}>
               {item.label}
               {active && <div style={{ marginLeft: 'auto', width: 3, height: 3, borderRadius: 99, background: '#911619' }} />}
@@ -66,8 +66,8 @@ export function Sidebar({ screen, setScreen, role, user }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <Avatar name={user.name} size={26} />
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 12.5, fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: '#555' }}>{user.name}</div>
-            <div style={{ fontSize: 10.5, color: '#888' }}>{role === 'admin' ? '管理者' : '新人'}</div>
+            <div style={{ fontSize: 13, fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: '#555' }}>{user.name}</div>
+            <div style={{ fontSize: 11, color: '#888' }}>{role === 'admin' ? '管理者' : '新人'}</div>
           </div>
         </div>
       </div>
@@ -84,7 +84,7 @@ export function AdminDashboard({ trainees, steps, setScreen, setSelectedTrainee,
   return (
     <div className="reveal" style={{ padding: '20px 28px', maxWidth: 960, margin: '0 auto' }}>
       <div style={{ marginBottom: 32 }}>
-        <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>管理者ダッシュボード</div>
+        <div style={{ fontSize: 13, color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>管理者ダッシュボード</div>
         <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.03em' }}>おはようございます、{adminFirstName}さん</h1>
       </div>
 
@@ -97,14 +97,14 @@ export function AdminDashboard({ trainees, steps, setScreen, setSelectedTrainee,
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-        <h2 style={{ fontSize: 13, fontWeight: 500, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>レビュー待ち · 今週の達成</h2>
+        <h2 style={{ fontSize: 14, fontWeight: 500, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>レビュー待ち · 今週の達成</h2>
         {recentCompletions.length > 0 && (
           <span style={{ fontSize: 11, fontWeight: 600, color: '#fff', background: '#911619', borderRadius: 99, padding: '1px 7px' }}>{recentCompletions.length}</span>
         )}
       </div>
       <Card style={{ padding: 0, overflow: 'hidden', marginBottom: 16 }}>
         {recentCompletions.length === 0 && (
-          <div style={{ padding: '16px 20px', fontSize: 13, color: '#bbb' }}>今週の達成はまだありません</div>
+          <div style={{ padding: '16px 20px', fontSize: 14, color: '#bbb' }}>今週の達成はまだありません</div>
         )}
         {recentCompletions.slice(0, 8).map(({ trainee, task, step, date }, i) => (
           <div key={i} style={{
@@ -112,15 +112,15 @@ export function AdminDashboard({ trainees, steps, setScreen, setSelectedTrainee,
             borderBottom: i < Math.min(recentCompletions.length, 8) - 1 ? '1px solid rgba(0,0,0,0.06)' : 'none',
           }}>
             <Avatar name={trainee.name} size={26} />
-            <div style={{ flex: 1, fontSize: 13 }}>
+            <div style={{ flex: 1, fontSize: 14 }}>
               <span style={{ fontWeight: 500 }}>{trainee.name}</span>
               <span style={{ color: '#888' }}> が </span>
-              <span style={{ fontSize: 11, fontWeight: 700, padding: '1px 6px', borderRadius: 4, background: 'rgba(0,0,0,0.05)', color: step.color }}>{step.label}</span>
+              <span style={{ fontSize: 12, fontWeight: 700, padding: '1px 6px', borderRadius: 4, background: 'rgba(0,0,0,0.05)', color: step.color }}>{step.label}</span>
               <span style={{ color: '#888' }}> {task.title}</span>
               <span style={{ color: '#888' }}> を完了</span>
             </div>
             {task.tag && <Badge color={task.tag === '課題' ? 'default' : 'yellow'}>{task.tag}</Badge>}
-            <span style={{ fontSize: 12, color: '#bbb', flexShrink: 0 }}>{relativeDate(date)}</span>
+            <span style={{ fontSize: 13, color: '#bbb', flexShrink: 0 }}>{relativeDate(date)}</span>
           </div>
         ))}
       </Card>
@@ -136,11 +136,11 @@ export function AdminDashboard({ trainees, steps, setScreen, setSelectedTrainee,
                   <Avatar name={t.name} size={36} />
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 2 }}>{t.name}</div>
-                    <div style={{ fontSize: 12, color: '#888' }}>入社 {t.joined} · {t.id}</div>
+                    <div style={{ fontSize: 13, color: '#888' }}>入社 {t.joined} · {t.id}</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: 22, fontWeight: 700, color: '#911619', lineHeight: 1 }}>{overall}<span style={{ fontSize: 13, color: '#888' }}>%</span></div>
-                    <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>全体完了率</div>
+                    <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>全体完了率</div>
                   </div>
                   <Btn size="sm" onClick={() => { setSelectedTrainee(t); setScreen('dashboard-trainee-view') }}>詳細 →</Btn>
                 </div>
@@ -151,9 +151,9 @@ export function AdminDashboard({ trainees, steps, setScreen, setSelectedTrainee,
                     return (
                       <div key={s.id} onClick={() => { setSelectedTrainee(t); setSelectedStep(s); setScreen('tasks') }}
                         style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5,
-                          padding: '3px 8px', borderRadius: 4, background: '#f0f0f0', border: '1px solid rgba(0,0,0,0.07)',
-                          fontSize: 12, color: '#666' }}>
-                        <span style={{ fontWeight: 700, color: s.color, fontSize: 11 }}>{s.label}</span>
+                          padding: '4px 10px', borderRadius: 4, background: '#f0f0f0', border: '1px solid rgba(0,0,0,0.07)',
+                          fontSize: 13, color: '#666' }}>
+                        <span style={{ fontWeight: 700, color: s.color, fontSize: 12 }}>{s.label}</span>
                         <span style={{ color: p === 100 ? '#911619' : '#888' }}>{p}%</span>
                       </div>
                     )
@@ -270,7 +270,7 @@ export function TraineeDashboard({ trainee, steps, notifications, setScreen, set
             <Card key={s.id} onClick={() => { setSelectedStep(s); setScreen('tasks') }} style={{ padding: '14px 18px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                 <div style={{ flexShrink: 0 }}>
-                  <div style={{ fontSize: 11, fontWeight: 800, color: s.color, letterSpacing: '-0.01em' }}>{s.label}</div>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: s.color, letterSpacing: '-0.01em' }}>{s.label}</div>
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: s.tasks.length ? 6 : 0 }}>
@@ -298,13 +298,13 @@ export function TraineeDashboard({ trainee, steps, notifications, setScreen, set
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 24 }}>
         <Card style={{ padding: '20px 22px' }}>
-          <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14 }}>達成ヒートマップ</div>
+          <div style={{ fontSize: 13, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14 }}>達成ヒートマップ</div>
           <HeatMap trainee={trainee} />
         </Card>
 
         <Card style={{ padding: '20px 22px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-            <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em' }}>通知</div>
+            <div style={{ fontSize: 13, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em' }}>通知</div>
             {notifications.length > 0 && (
               <span style={{ fontSize: 11, fontWeight: 600, color: '#fff', background: '#911619', borderRadius: 99, padding: '1px 7px' }}>{notifications.length}</span>
             )}
@@ -323,10 +323,10 @@ export function TraineeDashboard({ trainee, steps, notifications, setScreen, set
                     <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#911619', flexShrink: 0 }} />
                     <span style={{ fontSize: 13, fontWeight: 500, color: '#911619' }}>{n.who}</span>
                     <span style={{ fontSize: 12, color: '#888' }}>がコメント</span>
-                    <span style={{ fontSize: 11, color: '#bbb', marginLeft: 'auto' }}>{relativeDate(n.date)}</span>
+                    <span style={{ fontSize: 12, color: '#bbb', marginLeft: 'auto' }}>{relativeDate(n.date)}</span>
                   </div>
-                  <div style={{ fontSize: 12, color: '#888', marginBottom: 3 }}>
-                    {step && <span style={{ fontSize: 11, fontWeight: 700, color: step.color }}>{step.label}</span>}
+                  <div style={{ fontSize: 13, color: '#888', marginBottom: 3 }}>
+                    {step && <span style={{ fontSize: 12, fontWeight: 700, color: step.color }}>{step.label}</span>}
                     <span style={{ marginLeft: 4 }}>{task?.title || `課題 #${n.taskId}`}</span>
                   </div>
                   <div style={{ fontSize: 13, color: '#888', lineHeight: 1.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{n.text}</div>
@@ -345,7 +345,7 @@ export function StepListScreen({ trainee, steps, role, setScreen, setSelectedSte
   return (
     <div className="reveal" style={{ padding: '20px 28px', maxWidth: 860, margin: '0 auto' }}>
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>カリキュラム</div>
+        <div style={{ fontSize: 13, color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>カリキュラム</div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.03em' }}>学習ステップ</h1>
           {role === 'admin' && (
@@ -390,7 +390,7 @@ export function StepListScreen({ trainee, steps, role, setScreen, setSelectedSte
                 {/* Content */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                    <span style={{ fontSize: 11, fontWeight: 800, color: s.color, letterSpacing: '0.02em' }}>{s.label}</span>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: s.color, letterSpacing: '0.02em' }}>{s.label}</span>
                     {s.type === 'checklist' && <Badge color="blue">チェックリスト</Badge>}
                     {s.type === 'project' && <Badge color="yellow">実案件</Badge>}
                     {p === 100 && <Badge color="green">完了</Badge>}
@@ -401,7 +401,7 @@ export function StepListScreen({ trainee, steps, role, setScreen, setSelectedSte
                   {s.topics.length > 0 && (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 8 }}>
                       {s.topics.map((t, i) => (
-                        <span key={i} style={{ fontSize: 12, color: '#666', padding: '2px 8px', borderRadius: 4, background: '#f0f0f0', border: '1px solid rgba(0,0,0,0.06)' }}>
+                        <span key={i} style={{ fontSize: 13, color: '#666', padding: '3px 10px', borderRadius: 4, background: '#f0f0f0', border: '1px solid rgba(0,0,0,0.06)' }}>
                           {t}
                         </span>
                       ))}
@@ -410,7 +410,7 @@ export function StepListScreen({ trainee, steps, role, setScreen, setSelectedSte
 
                   {/* Submission & Criteria */}
                   {s.submission && (
-                    <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#888', marginBottom: 8 }}>
+                    <div style={{ display: 'flex', gap: 16, fontSize: 13, color: '#888', marginBottom: 8 }}>
                       <span><span style={{ color: '#bbb' }}>提出：</span>{s.submission}</span>
                       <span><span style={{ color: '#bbb' }}>合否：</span>{s.criteria}</span>
                     </div>
@@ -420,12 +420,12 @@ export function StepListScreen({ trainee, steps, role, setScreen, setSelectedSte
                   {s.tasks.length > 0 && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <div style={{ flex: 1, maxWidth: 200 }}><ProgressBar value={p} color={p === 100 ? '#911619' : s.color} height={4} /></div>
-                      <span style={{ fontSize: 12, color: '#888' }}>{done} / {s.tasks.length} 課題</span>
+                      <span style={{ fontSize: 13, color: '#888' }}>{done} / {s.tasks.length} 課題</span>
                       <span style={{ fontSize: 13, fontWeight: 700, color: p === 100 ? '#911619' : '#1a1a1a' }}>{p}%</span>
                     </div>
                   )}
                   {s.tasks.length === 0 && (
-                    <div style={{ fontSize: 12, color: '#bbb' }}>案件ごとに設定</div>
+                    <div style={{ fontSize: 13, color: '#bbb' }}>案件ごとに設定</div>
                   )}
                 </div>
 
@@ -448,7 +448,9 @@ export function StepListScreen({ trainee, steps, role, setScreen, setSelectedSte
 export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScreen, setSelectedTask, setEditTask }) {
   const [filter, setFilter] = React.useState('all')
   const [drawerTaskId, setDrawerTaskId] = React.useState(null)
-  const [drawerVisible, setDrawerVisible] = React.useState(false)
+  const [drawerBodyReady, setDrawerBodyReady] = React.useState(false)
+  const overlayRef = React.useRef(null)
+  const panelRef = React.useRef(null)
   const tasks = selectedStep?.tasks || []
   const checkedMap = trainee.checked[selectedStep?.id] || {}
   const isChecklist = selectedStep?.type === 'checklist'
@@ -463,12 +465,24 @@ export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScr
 
   function openDrawer(task) {
     setDrawerTaskId(task.id)
-    requestAnimationFrame(() => setDrawerVisible(true))
+    setDrawerBodyReady(false)
+    // 1フレーム目: React描画でPortal内コンテンツ更新 → 2フレーム目: ref経由でCSSトランジション開始
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (overlayRef.current) { overlayRef.current.style.opacity = '1'; overlayRef.current.style.pointerEvents = 'auto' }
+        if (panelRef.current) panelRef.current.style.transform = 'translateX(0)'
+        setTimeout(() => setDrawerBodyReady(true), 320)
+      })
+    })
   }
 
   function closeDrawer() {
-    setDrawerVisible(false)
-    setTimeout(() => setDrawerTaskId(null), 300)
+    if (overlayRef.current) { overlayRef.current.style.opacity = '0'; overlayRef.current.style.pointerEvents = 'none' }
+    if (panelRef.current) panelRef.current.style.transform = 'translateX(100%)'
+    setTimeout(() => {
+      setDrawerTaskId(null)
+      setDrawerBodyReady(false)
+    }, 300)
   }
 
   function toggleCheck(taskId) {
@@ -485,29 +499,29 @@ export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScr
   const pct = total ? Math.round((done / total) * 100) : 0
 
   return (
-    <div className="reveal" style={{ padding: '20px 40px' }}>
+    <div className="reveal" style={{ padding: '24px 40px' }}>
       {/* Breadcrumb */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, fontSize: 13, color: '#888' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, fontSize: 14, color: '#888' }}>
         <span onClick={() => setScreen('curriculum')} style={{ cursor: 'pointer', color: '#666' }}>カリキュラム</span>
         <span>›</span>
         <span style={{ color: '#1a1a1a', fontWeight: 500 }}>{selectedStep?.label}</span>
       </div>
 
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 18 }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-            <span style={{ fontSize: 12, fontWeight: 800, color: selectedStep?.color }}>{selectedStep?.label}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+            <span style={{ fontSize: 13, fontWeight: 800, color: selectedStep?.color }}>{selectedStep?.label}</span>
             {isChecklist && <Badge color="blue">チェックリスト</Badge>}
           </div>
-          <h1 style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 6 }}>
+          <h1 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 8 }}>
             {selectedStep?.title}
           </h1>
           {total > 0 && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ width: 200 }}><ProgressBar value={pct} color={selectedStep?.color || '#911619'} height={4} /></div>
-              <span style={{ fontSize: 13, color: '#666' }}>{done} / {total} 完了</span>
-              <span style={{ fontSize: 15, fontWeight: 700, color: '#911619' }}>{pct}%</span>
+              <div style={{ width: 200 }}><ProgressBar value={pct} color={selectedStep?.color || '#911619'} height={5} /></div>
+              <span style={{ fontSize: 14, color: '#666' }}>{done} / {total} 完了</span>
+              <span style={{ fontSize: 16, fontWeight: 700, color: '#911619' }}>{pct}%</span>
             </div>
           )}
         </div>
@@ -520,26 +534,26 @@ export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScr
 
       {/* Step info panel for assignment/project steps */}
       {!isChecklist && (selectedStep?.topics?.length > 0 || selectedStep?.submission) && (
-        <div style={{ marginBottom: 12, padding: '10px 14px', borderRadius: 8, background: `${selectedStep.color}0a`, border: `1px solid ${selectedStep.color}25` }}>
+        <div style={{ marginBottom: 16, padding: '12px 16px', borderRadius: 8, background: `${selectedStep.color}0a`, border: `1px solid ${selectedStep.color}25` }}>
           {selectedStep.topics.length > 0 && (
             <div style={{ marginBottom: selectedStep.submission ? 10 : 0 }}>
-              <div style={{ fontSize: 11, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>学習内容</div>
+              <div style={{ fontSize: 12, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>学習内容</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {selectedStep.topics.map((t, i) => (
-                  <span key={i} style={{ fontSize: 13, color: '#888', padding: '3px 10px', borderRadius: 5, background: '#ffffff', border: '1px solid rgba(0,0,0,0.08)' }}>{t}</span>
+                  <span key={i} style={{ fontSize: 14, color: '#888', padding: '4px 12px', borderRadius: 5, background: '#ffffff', border: '1px solid rgba(0,0,0,0.08)' }}>{t}</span>
                 ))}
               </div>
             </div>
           )}
           {selectedStep.submission && (
-            <div style={{ display: 'flex', gap: 24, marginTop: selectedStep.topics.length ? 10 : 0, fontSize: 13 }}>
+            <div style={{ display: 'flex', gap: 24, marginTop: selectedStep.topics.length ? 10 : 0, fontSize: 14 }}>
               <div>
-                <span style={{ color: '#999', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em' }}>提出方法　</span>
-                <span style={{ color: '#bbb', fontWeight: 500 }}>{selectedStep.submission}</span>
+                <span style={{ color: '#999', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.06em' }}>提出方法　</span>
+                <span style={{ color: '#999', fontWeight: 500 }}>{selectedStep.submission}</span>
               </div>
               <div>
-                <span style={{ color: '#999', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em' }}>合否基準　</span>
-                <span style={{ color: '#bbb', fontWeight: 500 }}>{selectedStep.criteria}</span>
+                <span style={{ color: '#999', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.06em' }}>合否基準　</span>
+                <span style={{ color: '#999', fontWeight: 500 }}>{selectedStep.criteria}</span>
               </div>
             </div>
           )}
@@ -548,13 +562,13 @@ export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScr
 
       {/* Filter */}
       {total > 0 && (
-        <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
+        <div style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
           {['all','done','undone'].map(f => (
             <button key={f} onClick={() => setFilter(f)} style={{
-              padding: '5px 12px', borderRadius: 6,
+              padding: '6px 14px', borderRadius: 6,
               border: `1px solid ${filter===f ? 'rgba(145,22,25,0.35)' : 'rgba(0,0,0,0.09)'}`,
               background: filter===f ? 'rgba(145,22,25,0.09)' : 'transparent',
-              color: filter===f ? '#911619' : '#666', fontSize: 13, cursor: 'pointer',
+              color: filter===f ? '#911619' : '#666', fontSize: 14, cursor: 'pointer',
               fontFamily: 'inherit', transition: 'all 0.12s',
             }}>
               {{ all:'すべて', done:'完了', undone:'未着手' }[f]}
@@ -571,7 +585,7 @@ export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScr
       )}
 
       {/* Task list */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         {filtered.map(task => {
           const isDone = String(task.id) in checkedMap
           const doneDate = checkedMap[String(task.id)]
@@ -579,28 +593,34 @@ export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScr
           return (
             <div key={task.id} onClick={() => openDrawer(task)} style={{
               display: 'flex', alignItems: 'center', gap: 14,
-              padding: '12px 16px', borderRadius: 12,
+              padding: '14px 20px', borderRadius: 12,
               background: isActive ? 'rgba(145,22,25,0.07)' : isDone ? 'rgba(145,22,25,0.04)' : '#ffffff',
               border: `1px solid ${isActive ? 'rgba(145,22,25,0.25)' : isDone ? 'rgba(145,22,25,0.09)' : 'rgba(0,0,0,0.07)'}`,
               transition: 'all 0.12s',
               cursor: 'pointer',
             }}>
               <div onClick={e => { e.stopPropagation(); toggleCheck(task.id) }} style={{
-                width: 20, height: 20, borderRadius: 5, flexShrink: 0,
+                width: 22, height: 22, borderRadius: 5, flexShrink: 0,
                 border: `2px solid ${isDone ? '#911619' : '#bbb'}`,
                 background: isDone ? '#911619' : 'transparent',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 cursor: 'pointer', transition: 'all 0.15s',
-                fontSize: 12, color: '#fff', fontWeight: 700,
+                fontSize: 13, color: '#fff', fontWeight: 700,
               }}>{isDone && '✓'}</div>
-              <span style={{ fontSize: 12, color: '#999', width: 20, textAlign: 'right', flexShrink: 0 }}>{task.no}</span>
+              <span style={{ fontSize: 13, color: '#999', width: 22, textAlign: 'right', flexShrink: 0 }}>{task.no}</span>
+              {task.tag && <span style={{
+                fontSize: 11, fontWeight: 600, flexShrink: 0,
+                padding: '2px 8px', borderRadius: 4,
+                background: task.tag === '基礎' ? 'rgba(145,22,25,0.08)' : 'rgba(180,130,20,0.10)',
+                color: task.tag === '基礎' ? '#911619' : '#8a6d14',
+              }}>{task.tag}</span>}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ color: isDone ? '#666' : '#1a1a1a', textDecoration: isDone ? 'line-through' : 'none', fontSize: 14, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{task.title}</div>
-                {doneDate && <div style={{ fontSize: 12, color: '#bbb', marginTop: 1 }}>達成日 {doneDate}</div>}
+                <div style={{ color: isDone ? '#666' : '#1a1a1a', textDecoration: isDone ? 'line-through' : 'none', fontSize: 15, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{task.title}</div>
+                {doneDate && <div style={{ fontSize: 13, color: '#bbb', marginTop: 2 }}>達成日 {doneDate}</div>}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                {task.links?.length > 0 && <span style={{ fontSize: 11, color: '#999', display: 'flex', alignItems: 'center', gap: 3 }}><Icon name="link" size={11} /> {task.links.length}</span>}
-                {task.comments?.length > 0 && <span style={{ fontSize: 11, color: '#999', display: 'flex', alignItems: 'center', gap: 3 }}><Icon name="comment" size={11} /> {task.comments.length}</span>}
+                {task.links?.length > 0 && <span style={{ fontSize: 12, color: '#999', display: 'flex', alignItems: 'center', gap: 3 }}><Icon name="link" size={12} /> {task.links.length}</span>}
+                {task.comments?.length > 0 && <span style={{ fontSize: 12, color: '#999', display: 'flex', alignItems: 'center', gap: 3 }}><Icon name="comment" size={12} /> {task.comments.length}</span>}
               </div>
               {role === 'admin' && (
                 <Btn size="sm" variant="ghost" onClick={e => { e.stopPropagation(); setEditTask({ ...task, stepId: selectedStep.id, links: task.links?.length ? task.links : [''], criteria: task.criteria || '', criteriaImage: task.criteriaImage || '' }); setScreen('edit') }}>編集</Btn>
@@ -610,39 +630,53 @@ export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScr
         })}
       </div>
 
-      {/* Drawer via Portal - rendered on body so it covers the full viewport */}
-      {drawerTaskId && createPortal(
+      {/* Drawer via Portal - always mounted to avoid mount/unmount jank */}
+      {createPortal(
         <>
           {/* Overlay - click to close */}
           <div
+            ref={overlayRef}
             onClick={closeDrawer}
             style={{
               position: 'fixed', inset: 0, zIndex: 1000,
               background: 'rgba(0,0,0,0.15)',
               transition: 'opacity 0.3s',
-              opacity: drawerVisible ? 1 : 0,
+              opacity: 0,
+              pointerEvents: 'none',
+              willChange: 'opacity',
             }}
           />
 
           {/* Slide-in detail drawer */}
-          {drawerTask && (
-            <div style={{
+            <div ref={panelRef} style={{
               position: 'fixed', top: 0, right: 0, bottom: 0,
               width: '65%',
               background: '#fff', zIndex: 1001,
               boxShadow: '-4px 0 24px rgba(0,0,0,0.10)',
-              transform: drawerVisible ? 'translateX(0)' : 'translateX(100%)',
+              transform: 'translateX(100%)',
               transition: 'transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1)',
+              willChange: 'transform',
               display: 'flex', flexDirection: 'column',
               overflow: 'hidden',
             }}>
+            {drawerTask && (() => {
+              const drawerChecked = String(drawerTask.id) in checkedMap
+              const drawerDoneDate = checkedMap[String(drawerTask.id)]
+              const hasCurriculum = drawerTask.desc?.includes('## 練習問題')
+              return (<>
               {/* Drawer header */}
               <div style={{
-                padding: '14px 24px', borderBottom: '1px solid rgba(0,0,0,0.08)',
-                background: `${selectedStep?.color}08`, flexShrink: 0,
+                padding: '20px 24px 16px', flexShrink: 0,
+                background: `linear-gradient(135deg, ${selectedStep?.color}12 0%, ${selectedStep?.color}06 100%)`,
+                borderBottom: `1px solid ${selectedStep?.color}18`,
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{
+                      fontSize: 11, fontWeight: 800, color: selectedStep?.color,
+                      padding: '2px 8px', borderRadius: 4,
+                      background: `${selectedStep?.color}15`, letterSpacing: '0.02em',
+                    }}>{selectedStep?.label}</span>
                     {drawerTask.tag && <Badge color={drawerTask.tag === '課題' ? 'default' : 'yellow'}>{drawerTask.tag}</Badge>}
                     <span style={{ fontSize: 12, color: '#999' }}>#{drawerTask.no}</span>
                   </div>
@@ -652,25 +686,71 @@ export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScr
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>✕</button>
                 </div>
-                <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em' }}>{drawerTask.title}</div>
+                <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 12 }}>{drawerTask.title}</div>
+                {/* Status pill */}
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  padding: '5px 12px', borderRadius: 20,
+                  background: drawerChecked ? 'rgba(34,197,94,0.1)' : 'rgba(0,0,0,0.04)',
+                  border: `1px solid ${drawerChecked ? 'rgba(34,197,94,0.25)' : 'rgba(0,0,0,0.08)'}`,
+                }}>
+                  <div style={{
+                    width: 8, height: 8, borderRadius: '50%',
+                    background: drawerChecked ? '#22c55e' : '#ccc',
+                  }} />
+                  <span style={{ fontSize: 12, fontWeight: 500, color: drawerChecked ? '#16a34a' : '#999' }}>
+                    {drawerChecked ? `完了済み${drawerDoneDate ? ` (${drawerDoneDate})` : ''}` : '未着手'}
+                  </span>
+                </div>
               </div>
 
               {/* Drawer body */}
-              <div style={{ flex: 1, overflow: 'auto', padding: '14px 24px' }}>
+              <div style={{ flex: 1, overflow: 'auto', padding: '16px 24px', background: '#fafafa' }}>
+                {!drawerBodyReady ? (
+                  <div style={{ padding: '20px 0' }}>
+                    {[100, 80, 90, 60].map((w, i) => (
+                      <div key={i} style={{ height: 14, width: `${w}%`, background: '#eee', borderRadius: 4, marginBottom: 10 }} />
+                    ))}
+                  </div>
+                ) : (<>
                 {/* Description */}
-                <div style={{ marginBottom: 16 }}>
-                  <div style={{ fontSize: 11, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>説明</div>
-                  {drawerTask.desc ? (
-                    <MarkdownRenderer content={drawerTask.desc} />
-                  ) : (
-                    <p style={{ fontSize: 13, color: '#ccc', margin: 0 }}>（説明なし）</p>
+                <div style={{
+                  marginBottom: 14, padding: '16px 18px', borderRadius: 10,
+                  background: '#fff', border: '1px solid rgba(0,0,0,0.06)',
+                }}>
+                  <div style={{ fontSize: 12, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ fontSize: 14 }}>📄</span> 説明
+                  </div>
+                  {drawerTask.desc ? (() => {
+                    const preview = hasCurriculum
+                      ? drawerTask.desc.split(/\n## /)[0].slice(0, 600) + (drawerTask.desc.length > 600 ? '\n\n...' : '')
+                      : drawerTask.desc
+                    return (
+                      <>
+                        <MarkdownRenderer content={preview} />
+                        {hasCurriculum && (
+                          <div style={{ marginTop: 10, padding: '10px 14px', borderRadius: 8, background: 'rgba(145,22,25,0.04)', border: '1px solid rgba(145,22,25,0.12)', fontSize: 13, color: '#911619', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}
+                            onClick={() => { setSelectedTask(drawerTask); setScreen('learn') }}>
+                            <span style={{ fontSize: 16 }}>📖</span>
+                            <span>全文は「学習を始める」から閲覧できます</span>
+                          </div>
+                        )}
+                      </>
+                    )
+                  })() : (
+                    <div style={{ fontSize: 13, color: '#bbb', padding: '12px 0', textAlign: 'center' }}>説明はまだ追加されていません</div>
                   )}
                 </div>
 
                 {/* Criteria */}
                 {(drawerTask.criteria || drawerTask.criteriaImage) && (
-                  <div style={{ marginBottom: 16 }}>
-                    <div style={{ fontSize: 11, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>完了条件</div>
+                  <div style={{
+                    marginBottom: 14, padding: '16px 18px', borderRadius: 10,
+                    background: '#fff', border: '1px solid rgba(0,0,0,0.06)',
+                  }}>
+                    <div style={{ fontSize: 12, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontSize: 14 }}>✅</span> 完了条件
+                    </div>
                     {drawerTask.criteria && (
                       <div style={{ fontSize: 13, color: '#1a1a1a', lineHeight: 1.7, marginBottom: drawerTask.criteriaImage ? 10 : 0 }}>
                         <MarkdownRenderer content={drawerTask.criteria} />
@@ -685,48 +765,57 @@ export function TaskListScreen({ trainee, setTrainee, selectedStep, role, setScr
                 )}
 
                 {/* Links */}
-                <div>
-                  <div style={{ fontSize: 11, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>参考リンク</div>
+                <div style={{
+                  padding: '16px 18px', borderRadius: 10,
+                  background: '#fff', border: '1px solid rgba(0,0,0,0.06)',
+                }}>
+                  <div style={{ fontSize: 12, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ fontSize: 14 }}>🔗</span> 参考リンク
+                  </div>
                   {(!drawerTask.links || drawerTask.links.length === 0) ? (
-                    <div style={{ fontSize: 13, color: '#ccc' }}>リンクなし</div>
+                    <div style={{ fontSize: 13, color: '#bbb', padding: '8px 0', textAlign: 'center' }}>リンクはまだ追加されていません</div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                       {drawerTask.links.map((url, i) => (
                         <a key={i} href={url} target="_blank" rel="noopener"
                           style={{
                             display: 'flex', alignItems: 'center', gap: 8,
-                            padding: '8px 10px', borderRadius: 6,
-                            background: '#f6f6f6', border: '1px solid rgba(0,0,0,0.06)',
-                            fontSize: 12, color: '#911619',
+                            padding: '8px 12px', borderRadius: 6,
+                            background: '#f8f8f8', border: '1px solid rgba(0,0,0,0.06)',
+                            fontSize: 13, color: '#911619',
                             textDecoration: 'none', overflow: 'hidden',
                             transition: 'background 0.12s',
                           }}
                           onMouseEnter={e => e.currentTarget.style.background = '#f0eaea'}
-                          onMouseLeave={e => e.currentTarget.style.background = '#f6f6f6'}
+                          onMouseLeave={e => e.currentTarget.style.background = '#f8f8f8'}
                         >
-                          <span style={{ flexShrink: 0, fontSize: 11, color: '#999' }}>0{i + 1}</span>
+                          <span style={{ flexShrink: 0, fontSize: 12, color: '#999' }}>0{i + 1}</span>
                           <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{url}</span>
-                          <span style={{ flexShrink: 0, fontSize: 11, color: '#999' }}>↗</span>
+                          <span style={{ flexShrink: 0, fontSize: 12, color: '#999' }}>↗</span>
                         </a>
                       ))}
                     </div>
                   )}
                 </div>
+                </>)}
               </div>
 
               {/* Drawer footer */}
               <div style={{
-                padding: '12px 24px', borderTop: '1px solid rgba(0,0,0,0.06)',
+                padding: '14px 24px', borderTop: '1px solid rgba(0,0,0,0.06)',
                 background: '#fafafa', flexShrink: 0,
-                display: 'flex', gap: 8, width: '100%', boxSizing: 'border-box', justifyContent: 'flex-end',
+                display: 'flex', gap: 10, width: '100%', boxSizing: 'border-box', justifyContent: 'flex-end',
               }}>
                 {role === 'admin' && (
-                  <Btn size="sm" onClick={() => { setEditTask({ ...drawerTask, stepId: selectedStep.id, links: drawerTask.links?.length ? drawerTask.links : [''], criteria: drawerTask.criteria || '', criteriaImage: drawerTask.criteriaImage || '' }); setScreen('edit') }}>編集</Btn>
+                  <Btn size="md" onClick={() => { setEditTask({ ...drawerTask, stepId: selectedStep.id, links: drawerTask.links?.length ? drawerTask.links : [''], criteria: drawerTask.criteria || '', criteriaImage: drawerTask.criteriaImage || '' }); setScreen('edit') }}>編集</Btn>
                 )}
-                <Btn variant="primary" size="sm" onClick={() => { setSelectedTask(drawerTask); setScreen('detail') }}>詳細ページを開く</Btn>
+                <Btn size="md" onClick={() => { setSelectedTask(drawerTask); setScreen('detail') }}>詳細ページ</Btn>
+                {drawerTask?.desc?.includes('## 練習問題') && (
+                  <Btn variant="primary" size="md" onClick={() => { setSelectedTask(drawerTask); setScreen('learn') }}>学習を始める</Btn>
+                )}
               </div>
+            </>)})()}
             </div>
-          )}
         </>,
         document.body
       )}
@@ -808,20 +897,20 @@ export function TaskDetailScreen({ task, trainee, setTrainee, selectedStep, role
             }}>{checked && '✓'}</div>
             <div>
               <span style={{ fontSize: 13, color: checked ? '#911619' : '#666' }}>{checked ? '完了済み' : '未着手'}</span>
-              {doneDate && <div style={{ fontSize: 11, color: '#888', marginTop: 1 }}>{doneDate}</div>}
+              {doneDate && <div style={{ fontSize: 12, color: '#888', marginTop: 1 }}>{doneDate}</div>}
             </div>
           </div>
         </div>
       </div>
 
       <Card style={{ marginBottom: 14 }}>
-        <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>説明</div>
+        <div style={{ fontSize: 13, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>説明</div>
         {task.desc ? <MarkdownRenderer content={task.desc} /> : <p style={{ color: '#bbb', fontSize: 15 }}>（説明なし）</p>}
       </Card>
 
       {(task.criteria || task.criteriaImage) && (
         <Card style={{ marginBottom: 14 }}>
-          <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>完了条件</div>
+          <div style={{ fontSize: 13, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>完了条件</div>
           {task.criteria && <MarkdownRenderer content={task.criteria} />}
           {task.criteriaImage && (
             <div style={{ marginTop: task.criteria ? 10 : 0, borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.08)' }}>
@@ -833,13 +922,13 @@ export function TaskDetailScreen({ task, trainee, setTrainee, selectedStep, role
 
       {task.links?.length > 0 && (
         <Card style={{ marginBottom: 14 }}>
-          <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>参考リンク</div>
+          <div style={{ fontSize: 13, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>参考リンク</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {task.links.map((url, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: '#f0f0f0', borderRadius: 6, border: '1px solid rgba(0,0,0,0.07)' }}>
-                <span style={{ fontSize: 12, color: '#999' }}>0{i+1}</span>
+                <span style={{ fontSize: 13, color: '#999' }}>0{i+1}</span>
                 <a href={url} target="_blank" rel="noopener" style={{ fontSize: 14, color: '#911619', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{url}</a>
-                <span style={{ fontSize: 11, color: '#999' }}>↗</span>
+                <span style={{ fontSize: 12, color: '#999' }}>↗</span>
               </div>
             ))}
           </div>
@@ -847,7 +936,7 @@ export function TaskDetailScreen({ task, trainee, setTrainee, selectedStep, role
       )}
 
       <Card>
-        <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14 }}>コメント（{localComments.length}）</div>
+        <div style={{ fontSize: 13, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14 }}>コメント（{localComments.length}）</div>
         {localComments.length === 0 && <div style={{ color: '#999', fontSize: 14, marginBottom: 16 }}>コメントはまだありません</div>}
         {localComments.map((c, i) => (
           <div key={c.id || i} style={{ marginBottom: 12, padding: '12px 14px', background: '#f0f0f0', borderRadius: 12, border: '1px solid rgba(0,0,0,0.07)' }}>
@@ -866,6 +955,493 @@ export function TaskDetailScreen({ task, trainee, setTrainee, selectedStep, role
           {submitting ? '送信中...' : '送信'}
         </Btn>
       </Card>
+    </div>
+  )
+}
+
+// ── Learning Screen ──────────────────────────────────────────────────────────
+
+function parseTaskContent(desc) {
+  if (!desc) return { sections: [], exercises: [], summary: '' }
+
+  // Split teaching vs exercises at "## 練習問題"
+  const exIdx = desc.indexOf('\n## 練習問題')
+  const teachingMd = exIdx >= 0 ? desc.substring(0, exIdx) : desc
+  const restMd = exIdx >= 0 ? desc.substring(exIdx + 1) : ''
+
+  // Parse teaching sections by ## headings
+  const sections = []
+  const sLines = teachingMd.split('\n')
+  let cur = null, buf = []
+  for (const line of sLines) {
+    if (line.startsWith('## ')) {
+      if (cur) { cur.content = buf.join('\n').trim(); sections.push(cur) }
+      cur = { title: line.replace(/^## /, ''), content: '' }
+      buf = [line]
+    } else {
+      buf.push(line)
+    }
+  }
+  if (cur) { cur.content = buf.join('\n').trim(); sections.push(cur) }
+
+  // Separate summary from exercises
+  const sumIdx = restMd.indexOf('\n## まとめ')
+  const exMd = sumIdx >= 0 ? restMd.substring(0, sumIdx) : restMd
+  const summary = sumIdx >= 0 ? restMd.substring(sumIdx + 1).trim() : ''
+
+  // Parse exercises by ### headings
+  const exercises = []
+  const eLines = exMd.split('\n')
+  let eCur = null, eBuf = []
+  for (const line of eLines) {
+    if (line.startsWith('### ')) {
+      if (eCur) { eCur.content = eBuf.join('\n').trim(); exercises.push(eCur) }
+      eCur = { fullTitle: line.replace(/^### /, ''), content: '' }
+      eBuf = []
+    } else if (eCur) {
+      eBuf.push(line)
+    }
+  }
+  if (eCur) { eCur.content = eBuf.join('\n').trim(); exercises.push(eCur) }
+
+  return { sections, exercises, summary }
+}
+
+const ExCheck = ({ checked, label, onClick, accent }) => (
+  <div onClick={onClick} style={{
+    marginTop: 12, display: 'flex', alignItems: 'center', gap: 8,
+    cursor: 'pointer', padding: '8px 12px', borderRadius: 8,
+    background: checked ? 'rgba(34,197,94,0.08)' : accent ? 'rgba(145,22,25,0.05)' : '#f0f0f0',
+    border: `1px solid ${checked ? 'rgba(34,197,94,0.2)' : accent ? 'rgba(145,22,25,0.15)' : 'rgba(0,0,0,0.06)'}`,
+    transition: 'all 0.15s',
+  }}>
+    <div style={{
+      width: 18, height: 18, borderRadius: 4, flexShrink: 0,
+      background: checked ? '#22c55e' : 'transparent',
+      border: `2px solid ${checked ? '#22c55e' : accent ? '#911619' : '#ccc'}`,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontSize: 12, color: '#fff', fontWeight: 700,
+    }}>{checked && '✓'}</div>
+    <span style={{ fontSize: 13, color: checked ? '#16a34a' : accent ? '#911619' : '#888' }}>{label}</span>
+  </div>
+)
+
+export function LearningScreen({ task, trainee, setTrainee, selectedStep, role, setScreen, setEditTask, setSelectedTask }) {
+  const contentRef = React.useRef(null)
+  const sectionRefs = React.useRef({})
+  const gateRefs = React.useRef({})
+  const [exerciseChecks, setExerciseChecks] = React.useState({})
+  const [activeSection, setActiveSection] = React.useState(0)
+
+  const { sections, exercises, summary } = React.useMemo(() => parseTaskContent(task.desc), [task.desc])
+
+  const checkedMap = trainee.checked[selectedStep?.id] || {}
+  const taskCompleted = String(task.id) in checkedMap
+
+  // Split exercises: first 3 = practice, next = test, rest = bonus
+  const practiceCount = Math.min(3, Math.max(0, exercises.length - 1))
+  const practiceExercises = exercises.slice(0, practiceCount)
+  const testExercise = exercises[practiceCount] || null
+  const bonusExercises = exercises.slice(practiceCount + 1)
+  const allPracticeDone = practiceExercises.length === 0 || practiceExercises.every((_, i) => exerciseChecks[i])
+  const testDone = exerciseChecks['test']
+
+  // Distribute sections into groups (one group per gate + final group)
+  const groups = React.useMemo(() => {
+    if (practiceExercises.length === 0) return [sections]
+    const result = []
+    let sIdx = 0
+    const totalGroups = practiceExercises.length + 1
+    for (let g = 0; g < totalGroups; g++) {
+      const remaining = sections.length - sIdx
+      const remainingGroups = totalGroups - g
+      const count = Math.ceil(remaining / remainingGroups)
+      result.push(sections.slice(sIdx, sIdx + count))
+      sIdx += count
+    }
+    return result
+  }, [sections, practiceExercises.length])
+
+  // Current gate: index of first unchecked exercise
+  const currentGate = React.useMemo(() => {
+    for (let i = 0; i < practiceExercises.length; i++) {
+      if (!exerciseChecks[i]) return i
+    }
+    return practiceExercises.length
+  }, [exerciseChecks, practiceExercises.length])
+
+  // Auto-scroll to newly unlocked content when gate clears
+  const prevGate = React.useRef(currentGate)
+  React.useEffect(() => {
+    if (currentGate > prevGate.current) {
+      const ref = gateRefs.current[prevGate.current]
+      if (ref && contentRef.current) {
+        setTimeout(() => {
+          contentRef.current.scrollTo({ top: ref.offsetTop + ref.offsetHeight + 20, behavior: 'smooth' })
+        }, 150)
+      }
+      prevGate.current = currentGate
+    }
+  }, [currentGate])
+
+  // Compute global section index for a group
+  function globalIdx(gIdx, sIdx) {
+    return groups.slice(0, gIdx).reduce((a, g) => a + g.length, 0) + sIdx
+  }
+
+  const scrollRAF = React.useRef(null)
+  function handleScroll(e) {
+    const el = e.target
+    if (scrollRAF.current) return
+    scrollRAF.current = requestAnimationFrame(() => {
+      scrollRAF.current = null
+      let newActive = 0
+      Object.entries(sectionRefs.current).forEach(([key, ref]) => {
+        if (ref && ref.offsetTop <= el.scrollTop + 120) newActive = parseInt(key)
+      })
+      setActiveSection(prev => prev === newActive ? prev : newActive)
+    })
+  }
+
+  function scrollToSection(idx) {
+    const ref = sectionRefs.current[idx]
+    if (ref && contentRef.current) {
+      contentRef.current.scrollTo({ top: ref.offsetTop - 20, behavior: 'smooth' })
+    }
+  }
+
+  function toggleExercise(key) {
+    setExerciseChecks(prev => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  // Complete task when test is done
+  React.useEffect(() => {
+    if (testDone && !taskCompleted) {
+      const cur = trainee.checked[selectedStep.id] || {}
+      const key = String(task.id)
+      setTrainee({
+        ...trainee,
+        checked: { ...trainee.checked, [selectedStep.id]: { ...cur, [key]: TODAY } }
+      })
+    }
+  }, [testDone, taskCompleted, trainee, selectedStep, task.id, setTrainee])
+
+  // Which TOC sections are visible
+  const visibleSectionCount = groups.slice(0, currentGate + 1).reduce((a, g) => a + g.length, 0)
+
+  // Right panel always visible (no slide-in)
+  const showPanel = exercises.length > 0
+
+  return (
+    <div style={{ display: 'flex', height: 'calc(100vh - 48px)', overflow: 'hidden' }}>
+      {/* ── TOC Sidebar ── */}
+      <div style={{
+        width: 210, minWidth: 210, borderRight: '1px solid rgba(0,0,0,0.08)',
+        background: '#fafafa', display: 'flex', flexDirection: 'column', overflow: 'hidden',
+      }}>
+        <div style={{ padding: '20px 16px 12px' }}>
+          <div style={{ fontSize: 12, color: '#999', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>目次</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#1a1a1a', lineHeight: 1.4 }}>{selectedStep?.label}-{task.no} {task.title}</div>
+        </div>
+        <nav style={{ flex: 1, overflow: 'auto', padding: '0 8px' }}>
+          {groups.map((group, gIdx) => (
+            <React.Fragment key={`g${gIdx}`}>
+              {group.map((s, sIdx) => {
+                const gi = globalIdx(gIdx, sIdx)
+                const locked = gi >= visibleSectionCount
+                return (
+                  <div key={gi} onClick={() => !locked && scrollToSection(gi)} style={{
+                    padding: '7px 10px', borderRadius: 6, cursor: locked ? 'default' : 'pointer', marginBottom: 1,
+                    fontSize: 12.5, lineHeight: 1.5, transition: 'all 0.15s',
+                    color: locked ? '#ccc' : activeSection === gi ? '#911619' : '#777',
+                    fontWeight: activeSection === gi ? 600 : 400,
+                    background: activeSection === gi ? 'rgba(145,22,25,0.06)' : 'transparent',
+                    borderLeft: `3px solid ${activeSection === gi ? '#911619' : 'transparent'}`,
+                  }}>{locked ? '🔒 ' : ''}{s.title}</div>
+                )
+              })}
+              {gIdx < practiceExercises.length && (
+                <div style={{
+                  padding: '5px 10px', fontSize: 12, margin: '2px 0',
+                  color: exerciseChecks[gIdx] ? '#16a34a' : gIdx <= currentGate ? '#911619' : '#ccc',
+                  display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600,
+                }}>
+                  {exerciseChecks[gIdx] ? '✓' : '○'} 練習 {gIdx + 1}
+                </div>
+              )}
+            </React.Fragment>
+          ))}
+          {testExercise && (
+            <>
+              <div style={{ height: 1, background: 'rgba(0,0,0,0.08)', margin: '4px 10px' }} />
+              <div style={{
+                padding: '5px 10px', fontSize: 12,
+                color: testDone ? '#16a34a' : allPracticeDone ? '#911619' : '#ccc',
+                display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600,
+              }}>
+                {testDone ? '✓' : '○'} テスト
+              </div>
+            </>
+          )}
+        </nav>
+        <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(0,0,0,0.08)' }}>
+          <div onClick={() => setScreen('tasks')} style={{ fontSize: 13, color: '#888', cursor: 'pointer' }}>← 課題一覧</div>
+        </div>
+      </div>
+
+      {/* ── Content Area (gated) ── */}
+      <div ref={contentRef} onScroll={handleScroll} style={{
+        flex: 1, overflow: 'auto', padding: '24px 32px',
+        background: '#fff', minWidth: 0,
+      }}>
+        {/* Breadcrumb */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, fontSize: 13, color: '#888' }}>
+          <span onClick={() => setScreen('curriculum')} style={{ cursor: 'pointer', color: '#666' }}>カリキュラム</span>
+          <span>›</span>
+          <span onClick={() => setScreen('tasks')} style={{ cursor: 'pointer', color: '#666' }}>{selectedStep?.label}</span>
+          <span>›</span>
+          <span style={{ color: '#1a1a1a' }}>{task.title}</span>
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+            {role === 'admin' && (
+              <Btn size="sm" onClick={() => { setEditTask({ ...task, stepId: selectedStep.id, links: task.links?.length ? task.links : [''], criteria: task.criteria || '', criteriaImage: task.criteriaImage || '' }); setScreen('edit') }}><Icon name="pencil" size={12} /> 編集</Btn>
+            )}
+            <Btn size="sm" onClick={() => { setSelectedTask(task); setScreen('detail') }}>コメント</Btn>
+          </div>
+        </div>
+
+        {/* Header */}
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 8, alignItems: 'center' }}>
+            <Badge>{selectedStep?.label}</Badge>
+            {task.tag && <Badge color="default">{task.tag}</Badge>}
+            {taskCompleted && <Badge color="blue">完了</Badge>}
+          </div>
+          <h1 style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.02em', margin: 0 }}>{task.title}</h1>
+        </div>
+
+        {/* ── Gated content: sections with gate stops ── */}
+        {groups.map((group, gIdx) => {
+          const isVisible = gIdx <= currentGate
+          if (!isVisible) return null
+
+          return (
+            <div key={gIdx} className={gIdx > 0 ? 'reveal' : undefined}>
+              {/* Sections in this group */}
+              {group.map((section, sIdx) => {
+                const gi = globalIdx(gIdx, sIdx)
+                return (
+                  <div key={gi} ref={el => sectionRefs.current[gi] = el} style={{ marginBottom: 4 }}>
+                    <MarkdownRenderer content={section.content} />
+                  </div>
+                )
+              })}
+
+              {/* Gate stop: points user to right panel */}
+              {gIdx < practiceExercises.length && !exerciseChecks[gIdx] && (
+                <div ref={el => gateRefs.current[gIdx] = el} style={{
+                  margin: '32px 0', padding: '20px 24px', borderRadius: 12,
+                  background: 'linear-gradient(135deg, rgba(145,22,25,0.05) 0%, rgba(145,22,25,0.02) 100%)',
+                  border: '2px solid rgba(145,22,25,0.15)',
+                  textAlign: 'center',
+                }}>
+                  <div style={{ fontSize: 22, marginBottom: 8 }}>👉</div>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: '#911619', marginBottom: 4 }}>
+                    練習 {gIdx + 1} に挑戦しよう
+                  </div>
+                  <div style={{ fontSize: 13, color: '#888' }}>
+                    右の練習問題パネルでチェックを入れると、次のセクションが開きます
+                  </div>
+                </div>
+              )}
+
+              {/* Gate cleared marker */}
+              {gIdx < practiceExercises.length && exerciseChecks[gIdx] && (
+                <div ref={el => gateRefs.current[gIdx] = el} style={{
+                  margin: '20px 0', display: 'flex', alignItems: 'center', gap: 10,
+                }}>
+                  <div style={{ flex: 1, height: 1, background: 'rgba(34,197,94,0.3)' }} />
+                  <span style={{ fontSize: 12, color: '#16a34a', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+                    ✓ 練習 {gIdx + 1} クリア
+                  </span>
+                  <div style={{ flex: 1, height: 1, background: 'rgba(34,197,94,0.3)' }} />
+                </div>
+              )}
+            </div>
+          )
+        })}
+
+        {/* ── Summary (after all sections visible) ── */}
+        {currentGate >= practiceExercises.length && summary && (
+          <div className="reveal" style={{ marginTop: 16, marginBottom: 16 }}>
+            <MarkdownRenderer content={summary} />
+          </div>
+        )}
+
+        {/* ── Test gate (visible after all practices done) ── */}
+        {allPracticeDone && testExercise && !testDone && (
+          <div className="reveal" style={{
+            margin: '32px 0', padding: '20px 24px', borderRadius: 12,
+            background: 'linear-gradient(135deg, rgba(145,22,25,0.06) 0%, rgba(145,22,25,0.02) 100%)',
+            border: '2px dashed rgba(145,22,25,0.2)',
+            textAlign: 'center',
+          }}>
+            <div style={{ fontSize: 22, marginBottom: 8 }}>📝</div>
+            <div style={{ fontSize: 15, fontWeight: 600, color: '#911619', marginBottom: 4 }}>
+              テストに挑戦しよう
+            </div>
+            <div style={{ fontSize: 13, color: '#888' }}>
+              右のパネルでテストをクリアするとこの課題は完了になります
+            </div>
+          </div>
+        )}
+
+        {/* ── Completion ── */}
+        {testDone && (
+          <div className="reveal" style={{
+            margin: '24px 0', padding: '20px 24px', borderRadius: 12,
+            background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.2)',
+            textAlign: 'center',
+          }}>
+            <div style={{ fontSize: 18, fontWeight: 700, color: '#16a34a', marginBottom: 6 }}>🎉 おつかれさまでした！</div>
+            <div style={{ fontSize: 14, color: '#888' }}>この課題は完了です。次の課題に進みましょう。</div>
+            <div style={{ marginTop: 14 }}>
+              <Btn variant="primary" size="md" onClick={() => setScreen('tasks')}>課題一覧に戻る</Btn>
+            </div>
+          </div>
+        )}
+
+        {/* Bottom spacer */}
+        <div style={{ height: 60 }} />
+      </div>
+
+      {/* ── Exercises Panel (right) ── */}
+      {showPanel && (
+        <div style={{
+          width: 370, minWidth: 370,
+          borderLeft: '1px solid rgba(0,0,0,0.08)',
+          background: '#fafafa',
+          display: 'flex', flexDirection: 'column', overflow: 'hidden',
+        }}>
+          <div style={{ flex: 1, overflow: 'auto', padding: '20px 16px' }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: '#1a1a1a', marginBottom: 4 }}>練習問題</div>
+            <div style={{ fontSize: 12, color: '#999', marginBottom: 16 }}>
+              {practiceExercises.length}問の練習 + テスト
+            </div>
+
+            {/* Practice exercises - reveal progressively */}
+            {practiceExercises.map((ex, i) => {
+              const isActive = i === currentGate && !exerciseChecks[i]
+              const isLocked = i > currentGate
+              if (isLocked) return (
+                <div key={i} style={{
+                  marginBottom: 12, padding: '14px 16px', borderRadius: 10,
+                  background: 'rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.06)',
+                  opacity: 0.4,
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, padding: '2px 8px', borderRadius: 4, background: 'rgba(0,0,0,0.06)', color: '#999' }}>練習 {i + 1}</span>
+                    <span style={{ fontSize: 13, color: '#999' }}>🔒</span>
+                  </div>
+                </div>
+              )
+              return (
+                <div key={i} style={{
+                  marginBottom: 12, padding: '14px 16px', borderRadius: 10,
+                  background: isActive ? '#fff' : '#fff',
+                  border: `${isActive ? '2px' : '1px'} solid ${exerciseChecks[i] ? 'rgba(34,197,94,0.3)' : isActive ? 'rgba(145,22,25,0.3)' : 'rgba(0,0,0,0.08)'}`,
+                  boxShadow: isActive ? '0 2px 12px rgba(145,22,25,0.08)' : 'none',
+                  transition: 'all 0.3s',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                    <span style={{
+                      fontSize: 12, fontWeight: 700, padding: '2px 8px', borderRadius: 4,
+                      color: exerciseChecks[i] ? '#16a34a' : '#911619',
+                      background: exerciseChecks[i] ? 'rgba(34,197,94,0.08)' : 'rgba(145,22,25,0.08)',
+                    }}>練習 {i + 1}</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a', flex: 1 }}>
+                      {ex.fullTitle.replace(/^練習\d+[:：]\s*/, '')}
+                    </span>
+                    {isActive && <span style={{ fontSize: 11, fontWeight: 600, color: '#911619', padding: '2px 6px', borderRadius: 4, background: 'rgba(145,22,25,0.08)' }}>NOW</span>}
+                  </div>
+                  <div style={{ fontSize: 13, color: '#555' }}>
+                    <MarkdownRenderer content={ex.content} />
+                  </div>
+                  <ExCheck
+                    checked={exerciseChecks[i]}
+                    label={exerciseChecks[i] ? '完了！' : 'できたらチェック'}
+                    onClick={() => toggleExercise(i)}
+                  />
+                </div>
+              )
+            })}
+
+            {/* Test */}
+            {testExercise && (
+              <>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '16px 0 8px' }}>
+                  <div style={{ flex: 1, height: 1, background: 'rgba(0,0,0,0.1)' }} />
+                  <span style={{ fontSize: 12, color: '#999', fontWeight: 600 }}>テスト</span>
+                  <div style={{ flex: 1, height: 1, background: 'rgba(0,0,0,0.1)' }} />
+                </div>
+                <div style={{
+                  padding: '14px 16px', borderRadius: 10,
+                  background: allPracticeDone ? '#fff' : 'rgba(0,0,0,0.02)',
+                  border: `${allPracticeDone && !testDone ? '2px' : '1px'} solid ${testDone ? 'rgba(34,197,94,0.3)' : allPracticeDone ? 'rgba(145,22,25,0.2)' : 'rgba(0,0,0,0.06)'}`,
+                  opacity: allPracticeDone ? 1 : 0.4,
+                  pointerEvents: allPracticeDone ? 'auto' : 'none',
+                  boxShadow: allPracticeDone && !testDone ? '0 2px 12px rgba(145,22,25,0.08)' : 'none',
+                  transition: 'all 0.3s',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#fff', background: testDone ? '#22c55e' : '#911619', padding: '2px 8px', borderRadius: 4 }}>テスト</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a', flex: 1 }}>
+                      {testExercise.fullTitle.replace(/^練習\d+[:：]\s*/, '')}
+                    </span>
+                    {allPracticeDone && !testDone && <span style={{ fontSize: 11, fontWeight: 600, color: '#911619', padding: '2px 6px', borderRadius: 4, background: 'rgba(145,22,25,0.08)' }}>NOW</span>}
+                  </div>
+                  <div style={{ fontSize: 13, color: '#555' }}>
+                    <MarkdownRenderer content={testExercise.content} />
+                  </div>
+                  {!allPracticeDone ? (
+                    <div style={{ marginTop: 10, fontSize: 12, color: '#999' }}>🔒 練習問題をすべて完了するとロック解除</div>
+                  ) : (
+                    <ExCheck
+                      checked={testDone}
+                      label={testDone ? '✅ 課題クリア！' : '正解したらこちらをチェックして次へ'}
+                      onClick={() => toggleExercise('test')}
+                      accent
+                    />
+                  )}
+                </div>
+              </>
+            )}
+
+            {/* Bonus exercises */}
+            {bonusExercises.length > 0 && (
+              <>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '16px 0 8px' }}>
+                  <div style={{ flex: 1, height: 1, background: 'rgba(0,0,0,0.06)' }} />
+                  <span style={{ fontSize: 12, color: '#bbb' }}>ボーナス</span>
+                  <div style={{ flex: 1, height: 1, background: 'rgba(0,0,0,0.06)' }} />
+                </div>
+                {bonusExercises.map((ex, i) => (
+                  <div key={i} style={{
+                    padding: '14px 16px', borderRadius: 10, marginBottom: 8,
+                    background: '#fff', border: '1px solid rgba(0,0,0,0.06)',
+                  }}>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: '#999', marginBottom: 8 }}>
+                      {ex.fullTitle.replace(/^練習\d+[:：]\s*/, '')}
+                    </div>
+                    <div style={{ fontSize: 13, color: '#555' }}>
+                      <MarkdownRenderer content={ex.content} />
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -905,7 +1481,7 @@ export function TaskEditScreen({ editTask, steps, setScreen, onSave }) {
   return (
     <div className="reveal" style={{ padding: '20px 28px' }}>
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>管理者専用</div>
+        <div style={{ fontSize: 13, color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>管理者専用</div>
         <h1 style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.02em' }}>{isNew ? '課題を追加' : '課題を編集'}</h1>
       </div>
 
@@ -986,7 +1562,7 @@ export function TraineeManagementScreen({ trainees, steps, setScreen, setSelecte
   return (
     <div className="reveal" style={{ padding: '20px 28px', maxWidth: 860, margin: '0 auto' }}>
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>管理者専用</div>
+        <div style={{ fontSize: 13, color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>管理者専用</div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.03em' }}>新人管理</h1>
           <Btn variant="primary" size="sm">＋ 新人を追加</Btn>
@@ -1004,24 +1580,24 @@ export function TraineeManagementScreen({ trainees, steps, setScreen, setSelecte
                 <Avatar name={t.name} size={36} />
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 600, marginBottom: 2 }}>{t.name}</div>
-                  <div style={{ fontSize: 12, color: '#888' }}>入社 {t.joined} · {t.id}</div>
+                  <div style={{ fontSize: 13, color: '#888' }}>入社 {t.joined} · {t.id}</div>
                 </div>
                 <div style={{ width: 120 }}>
                   <ProgressBar value={overall} height={4} />
-                  <div style={{ fontSize: 12, color: '#888', marginTop: 3, textAlign: 'right' }}>{overall}%</div>
+                  <div style={{ fontSize: 13, color: '#888', marginTop: 3, textAlign: 'right' }}>{overall}%</div>
                 </div>
                 <Btn size="sm" variant="ghost" onClick={e => { e.stopPropagation(); setSelectedTrainee(t); setScreen('dashboard-trainee-view') }}>進捗詳細 →</Btn>
                 <span style={{ color: '#999', transition: 'transform 0.2s', display: 'inline-block', transform: isExp ? 'rotate(180deg)' : 'none' }}>▾</span>
               </div>
               {isExp && (
                 <div style={{ padding: '0 18px 18px', borderTop: '1px solid rgba(0,0,0,0.07)' }}>
-                  <div style={{ marginTop: 14, marginBottom: 10, fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em' }}>ステップ別進捗</div>
+                  <div style={{ marginTop: 14, marginBottom: 10, fontSize: 13, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em' }}>ステップ別進捗</div>
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                     {steps.map(s => {
                       const p = s.tasks.length ? getProgress(t, s.id, steps) : null
                       return (
                         <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 6, background: '#f0f0f0', border: '1px solid rgba(0,0,0,0.07)' }}>
-                          <span style={{ fontSize: 11, fontWeight: 700, color: s.color }}>{s.label}</span>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: s.color }}>{s.label}</span>
                           {p !== null
                             ? <span style={{ fontSize: 13, color: p === 100 ? '#911619' : '#666', fontWeight: 600 }}>{p}%</span>
                             : <span style={{ fontSize: 12, color: '#bbb' }}>-</span>
@@ -1045,11 +1621,11 @@ export function TraineeManagementScreen({ trainees, steps, setScreen, setSelecte
       <Card style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         <div style={{ display: 'flex', gap: 12 }}>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>名前</div>
+            <div style={{ fontSize: 13, color: '#888', marginBottom: 6 }}>名前</div>
             <Input value={newName} onChange={setNewName} placeholder="例：佐藤 次郎" />
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>社員ID</div>
+            <div style={{ fontSize: 13, color: '#888', marginBottom: 6 }}>社員ID</div>
             <Input placeholder="例：trainee_004" />
           </div>
         </div>
@@ -1080,12 +1656,12 @@ export function TraineeDetailView({ trainee, steps, setScreen, setSelectedStep }
         </div>
         <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
           <div style={{ fontSize: 36, fontWeight: 700, color: '#911619', lineHeight: 1 }}>{overall}<span style={{ fontSize: 16, color: '#888' }}>%</span></div>
-          <div style={{ fontSize: 12, color: '#888' }}>全体完了率</div>
+          <div style={{ fontSize: 13, color: '#888' }}>全体完了率</div>
         </div>
       </div>
       <Card style={{ marginBottom: 16, padding: '18px 20px' }}>
         <ProgressBar value={overall} height={6} />
-        <div style={{ fontSize: 12, color: '#888', marginTop: 6 }}>
+        <div style={{ fontSize: 13, color: '#888', marginTop: 6 }}>
           {getTotalDone(trainee)} / {totalTasks} 課題完了
         </div>
       </Card>
@@ -1098,7 +1674,7 @@ export function TraineeDetailView({ trainee, steps, setScreen, setSelectedStep }
             <Card key={s.id} onClick={() => { setSelectedStep(s); setScreen('tasks') }} style={{ padding: '14px 18px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                 <div style={{ flexShrink: 0, width: 52 }}>
-                  <div style={{ fontSize: 11, fontWeight: 800, color: s.color }}>{s.label}</div>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: s.color }}>{s.label}</div>
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: p !== null ? 6 : 0 }}>
